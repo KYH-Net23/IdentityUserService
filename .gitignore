@@ -396,3 +396,12 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+/.idea/projectSettingsUpdater.xml
+/.idea/indexLayout.xml
+/.idea/workspace.xml
+/.idea/encodings.xml
+/.idea/vcs.xml
+/IdentityService/appsettings.json
+/.idea/dataSources.xml
+/IdentityService/Migrations/
+/.idea/modules.xml
