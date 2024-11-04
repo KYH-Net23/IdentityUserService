@@ -14,4 +14,6 @@ public class Customer : IdentityUser
         ErrorMessage = "Username must be between 5 and 200 characters"
     )]
     public string Address { get; set; } = null!;
+
+    public bool IsDeleted { get; set; }
 }
