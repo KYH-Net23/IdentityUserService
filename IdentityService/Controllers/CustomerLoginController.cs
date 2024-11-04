@@ -1,5 +1,6 @@
 ﻿using IdentityService.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IdentityService.Controllers;
@@ -10,22 +11,16 @@ namespace IdentityService.Controllers;
 public class CustomerLoginController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager) : ControllerBase
 {
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginModel loginModel)
+    public async Task<bool> Login([FromBody] LoginRequest loginModel)
     {
         if (!ModelState.IsValid)
         {
-            return BadRequest();
+            return false;
         }
 
         var tryToSignIn = await signInManager.PasswordSignInAsync(loginModel.Email, loginModel.Password, false, false);
 
-        if (tryToSignIn.Succeeded)
-        {
-            return Ok("User logged in");
-            // Call on token service to create JWT
-        }
-
-        return BadRequest();
+        return tryToSignIn.Succeeded;
     }
 
     //Only use this for seeding purposes, remove later
