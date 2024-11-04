@@ -25,7 +25,15 @@ public class CustomerLoginController(SignInManager<IdentityUser> signInManager, 
             return BadRequest("Success: " + tryToSignIn);
         }
 
-        return Ok("Success: " + tryToSignIn.Succeeded);
+        var loggedInUser = await userManager.FindByEmailAsync(loginModel.Email);
+        var userRole = await userManager.GetRolesAsync(loggedInUser!);
+
+        return Ok(new
+        {
+            loggedInUser!.Id,
+            loggedInUser.Email,
+            Roles = userRole
+        });
     }
 
     //Only use this for seeding purposes, remove later
