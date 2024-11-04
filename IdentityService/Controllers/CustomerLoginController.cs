@@ -11,16 +11,21 @@ namespace IdentityService.Controllers;
 public class CustomerLoginController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager) : ControllerBase
 {
     [HttpPost("login")]
-    public async Task<bool> Login([FromBody] LoginRequest loginModel)
+    public async Task<IActionResult> Login([FromBody] LoginRequest loginModel)
     {
         if (!ModelState.IsValid)
         {
-            return false;
+            return BadRequest("Modelstate invalid");
         }
 
         var tryToSignIn = await signInManager.PasswordSignInAsync(loginModel.Email, loginModel.Password, false, false);
 
-        return tryToSignIn.Succeeded;
+        if (!tryToSignIn.Succeeded)
+        {
+            return BadRequest("Success: " + tryToSignIn);
+        }
+
+        return Ok("Success: " + tryToSignIn.Succeeded);
     }
 
     //Only use this for seeding purposes, remove later
