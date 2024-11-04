@@ -4,6 +4,5 @@ namespace IdentityService.Models;
 
 public class Admin : IdentityUser
 {
-    // Add extra
-    public string Test { get; set; } = null!;
+    public bool IsDeleted { get; set; }
 }
