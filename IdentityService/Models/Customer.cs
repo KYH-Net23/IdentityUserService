@@ -13,7 +13,17 @@ public class Customer : IdentityUser
         MinimumLength = 5,
         ErrorMessage = "Username must be between 5 and 200 characters"
     )]
-    public string Address { get; set; } = null!;
+    public string StreetAddress { get; set; } = null!;
+    
+    public string? City { get; set; }
+    
+    public DateTime DateOfBirth { get; set; }
+    
+    public string? ProfilePictureUrl { get; set; }
+    
+    public DateTime AccountCreationDate { get; set; }
+    
+    public DateTime LastActiveDate { get; set; }
 
     public bool IsDeleted { get; set; }
 }

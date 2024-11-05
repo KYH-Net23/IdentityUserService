@@ -9,7 +9,9 @@ public static class CustomerRequestResponseFactory
         return new CustomerRequestResponse
         {
             Id = customer.Id,
-            Address = customer.Address,
+            StreetAddress = customer.StreetAddress,
+            City = customer.City!,
+            DateOfBirth = customer.DateOfBirth,
             Email = customer.Email!,
             PhoneNumber = customer.PhoneNumber!,
             Username = customer.UserName!
