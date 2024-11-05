@@ -55,7 +55,6 @@ else
         new DefaultAzureCredential());
 }
 
-
 builder.Services.AddDataProtection();
 
 builder.Services.AddScoped<CustomerService>();
@@ -64,7 +63,11 @@ builder.Services.AddScoped<AdminService>();
 // builder.Services.AddScoped<DataInitializer>();
 
 builder
-    .Services.AddIdentity<IdentityUser, IdentityRole>()
+    .Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+    {
+        options.Lockout.MaxFailedAccessAttempts = 3;
+        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);
+    })
     .AddDefaultTokenProviders()
     .AddEntityFrameworkStores<DataContext>();
 
