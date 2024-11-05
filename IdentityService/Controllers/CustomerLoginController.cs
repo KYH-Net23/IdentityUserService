@@ -1,4 +1,5 @@
 ﻿using IdentityService.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
@@ -11,29 +12,42 @@ namespace IdentityService.Controllers;
 public class CustomerLoginController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager) : ControllerBase
 {
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginRequest loginModel)
+    public async Task<IActionResult> Login([FromBody] LoginModel loginModel)
     {
-        if (!ModelState.IsValid)
+        try
         {
-            return BadRequest("Modelstate invalid");
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Modelstate invalid");
+            }
+
+            var loggedInUser = await userManager.FindByEmailAsync(loginModel.Email);
+        
+            if(loggedInUser == null)
+            {
+                return BadRequest("User not found");
+            }
+        
+            var tryToSignIn = await signInManager.PasswordSignInAsync(loggedInUser.UserName!, loginModel.Password, false, false);
+
+            if (!tryToSignIn.Succeeded)
+            {
+                return BadRequest("Login failed");
+            }
+
+            var userRole = await userManager.GetRolesAsync(loggedInUser!);
+
+            return Ok(new
+            {
+                loggedInUser!.Id,
+                loggedInUser.Email,
+                Roles = userRole
+            });
         }
-
-        var tryToSignIn = await signInManager.PasswordSignInAsync(loginModel.Email, loginModel.Password, false, false);
-
-        if (!tryToSignIn.Succeeded)
+        catch (Exception e)
         {
-            return BadRequest("Success: " + tryToSignIn);
+            return BadRequest(e.Message);
         }
-
-        var loggedInUser = await userManager.FindByEmailAsync(loginModel.Email);
-        var userRole = await userManager.GetRolesAsync(loggedInUser!);
-
-        return Ok(new
-        {
-            loggedInUser!.Id,
-            loggedInUser.Email,
-            Roles = userRole
-        });
     }
 
     //Only use this for seeding purposes, remove later
