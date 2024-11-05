@@ -10,9 +10,9 @@ public class CustomerController(CustomerService customerService) : ControllerBas
 {
     [ApiExplorerSettings(GroupName = "v1")]
     [HttpGet("[action]")]
-    public async Task<IEnumerable<CustomerRequestResponse>> GetAll()
+    public async Task<IActionResult> GetAll()
     {
-        return await customerService.GetDemoCustomers();
+        return Ok(await customerService.GetDemoCustomers());
     }
 
     [ApiExplorerSettings(GroupName = "v2")]

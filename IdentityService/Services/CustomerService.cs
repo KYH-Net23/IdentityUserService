@@ -13,7 +13,9 @@ public class CustomerService(SignInManager<IdentityUser> signInManager, UserMana
     {
         var listOfCustomers = await userManager.GetUsersInRoleAsync(UserRoles.Customer.ToString());
 
-        return CustomerRequestResponseFactory.Create((listOfCustomers as IList<Customer>)!);
+        var customerList = listOfCustomers.OfType<Customer>().ToList();
+        
+        return CustomerRequestResponseFactory.Create(customerList);
     }
 
     public async Task<ResponseResult> CustomerLogin(LoginModel loginModel)
