@@ -77,9 +77,9 @@ var app = builder.Build();
 //
 //     var dataInitializer = new DataInitializer(roleManager, customerManager);
 //
-//     //await dataInitializer.SeedRoles();
+//     await dataInitializer.SeedRoles();
 //     await dataInitializer.SeedUsers();
-//     //await dataInitializer.SeedUserRoles();
+//     await dataInitializer.SeedUserRoles();
 // }
 
 app.UseSwagger();

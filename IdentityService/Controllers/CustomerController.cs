@@ -21,4 +21,30 @@ public class CustomerController(CustomerService customerService) : ControllerBas
     {
         return null;
     }
+    
+    [ApiExplorerSettings(GroupName = "v2")]
+    [HttpPost("[action]")]
+    public async Task<IActionResult> Register([FromBody] CreateCustomerModel registerModel)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Modelstate invalid");
+            }
+            
+            var result = await customerService.RegisterCustomer(registerModel);
+
+            if (result.Succeeded)
+            {
+                return Ok(result.Message);
+            }
+
+            return BadRequest(result.Message);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
 }
