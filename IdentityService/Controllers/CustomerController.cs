@@ -47,4 +47,8 @@ public class CustomerController(CustomerService customerService) : ControllerBas
             return BadRequest(e.Message);
         }
     }
+    
+    //HttpPatch
+    
+    //HttpDelete sitt konto?
 }

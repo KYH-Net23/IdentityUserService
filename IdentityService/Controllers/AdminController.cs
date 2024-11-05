@@ -29,30 +29,6 @@ public class AdminController(UserManager<IdentityUser> userManager) : Controller
         return Ok("List of users");
     }
 
-    [HttpPost("create")]
-    public async Task<IActionResult> CreateUser(CreateCustomerModel model)
-    {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-
-        var newCustomer = new Customer
-        {
-            UserName = model.Username,
-            NormalizedUserName = model.Username.ToUpper(),
-            Email = model.Email,
-            NormalizedEmail = model.Email.ToUpper(),
-            PhoneNumber = model.PhoneNumber,
-            StreetAddress = model.StreetAddress
-        };
-
-        await userManager.CreateAsync(newCustomer, model.Password);
-        await userManager.AddToRoleAsync(newCustomer, UserRoles.Customer.ToString());
-
-        return Ok("User created");
-    }
-
     [HttpDelete("delete/{userId}")]
     public async Task<IActionResult> DeleteUser(string userId)
     {

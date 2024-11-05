@@ -7,13 +7,66 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IdentityService.Services;
 
-public class CustomerService(UserManager<IdentityUser> userManager)
+public class CustomerService(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
 {
     public async Task<List<CustomerRequestResponse>> GetDemoCustomers()
     {
         var listOfCustomers = await userManager.GetUsersInRoleAsync(UserRoles.Customer.ToString());
 
         return CustomerRequestResponseFactory.Create((listOfCustomers as IList<Customer>)!);
+    }
+    
+    public async Task<ResponseResult> CustomerLogin(LoginModel loginModel)
+    {
+        try
+        {
+            
+
+            var loggedInUser = await userManager.FindByEmailAsync(loginModel.Email);
+        
+            if(loggedInUser == null)
+            {
+                return new ResponseResult
+                {
+                    Succeeded = false,
+                    Message = "User not found"
+                };
+            }
+        
+            var tryToSignIn = await signInManager.PasswordSignInAsync(loggedInUser.UserName!, loginModel.Password, false, false);
+
+            if (!tryToSignIn.Succeeded)
+            {
+                return new ResponseResult
+                {
+                    Succeeded = false,
+                    Message = "Login failed"
+                };
+            }
+
+            var userRole = await userManager.GetRolesAsync(loggedInUser!);
+
+            return new ResponseResult
+            {
+                Succeeded = true,
+                Message = "Login successful",
+                Content = new
+                {
+                    loggedInUser.Id,
+                    loggedInUser.Email,
+                    Roles = userRole
+                }
+            };
+
+        }
+        catch (Exception e)
+        {
+            return new ResponseResult
+            {
+                Succeeded = false,
+                Message = e.Message
+            };
+        }
     }
 
     public async Task<ResponseResult> RegisterCustomer(CreateCustomerModel registerModel)
