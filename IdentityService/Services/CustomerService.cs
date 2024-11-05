@@ -15,16 +15,14 @@ public class CustomerService(SignInManager<IdentityUser> signInManager, UserMana
 
         return CustomerRequestResponseFactory.Create((listOfCustomers as IList<Customer>)!);
     }
-    
+
     public async Task<ResponseResult> CustomerLogin(LoginModel loginModel)
     {
         try
         {
-            
-
             var loggedInUser = await userManager.FindByEmailAsync(loginModel.Email);
-        
-            if(loggedInUser == null)
+
+            if (loggedInUser == null)
             {
                 return new ResponseResult
                 {
@@ -32,16 +30,27 @@ public class CustomerService(SignInManager<IdentityUser> signInManager, UserMana
                     Message = "User not found"
                 };
             }
-        
-            var tryToSignIn = await signInManager.PasswordSignInAsync(loggedInUser.UserName!, loginModel.Password, false, false);
+
+            var tryToSignIn =
+                await signInManager.PasswordSignInAsync(loggedInUser.UserName!, loginModel.Password, false, false);
 
             if (!tryToSignIn.Succeeded)
             {
+                var counter = await userManager.GetAccessFailedCountAsync(loggedInUser);
+                await userManager.AccessFailedAsync(loggedInUser);
+                if (!await userManager.IsLockedOutAsync(loggedInUser))
+                    return new ResponseResult
+                    {
+                        Succeeded = false,
+                        Message = "Login failed"
+                    };
+                var lockoutEndDate = await userManager.GetLockoutEndDateAsync(loggedInUser);
                 return new ResponseResult
                 {
                     Succeeded = false,
-                    Message = "Login failed"
+                    Message = $"Too many attempts. Account temporarily locked until {lockoutEndDate}"
                 };
+
             }
 
             var userRole = await userManager.GetRolesAsync(loggedInUser!);
@@ -57,7 +66,6 @@ public class CustomerService(SignInManager<IdentityUser> signInManager, UserMana
                     Roles = userRole
                 }
             };
-
         }
         catch (Exception e)
         {
@@ -75,7 +83,7 @@ public class CustomerService(SignInManager<IdentityUser> signInManager, UserMana
         {
             var existingUserName = await userManager.FindByNameAsync(registerModel.Username);
             var existingEmail = await userManager.FindByEmailAsync(registerModel.Email);
-        
+
             if (existingUserName != null || existingEmail != null)
             {
                 return new ResponseResult
@@ -84,7 +92,7 @@ public class CustomerService(SignInManager<IdentityUser> signInManager, UserMana
                     Message = "User already exists"
                 };
             }
-        
+
             var newCustomer = new Customer
             {
                 UserName = registerModel.Username,
@@ -101,7 +109,7 @@ public class CustomerService(SignInManager<IdentityUser> signInManager, UserMana
 
             await userManager.CreateAsync(newCustomer, registerModel.Password);
             await userManager.AddToRoleAsync(newCustomer, UserRoles.Customer.ToString());
-            
+
             return new ResponseResult
             {
                 Succeeded = true,

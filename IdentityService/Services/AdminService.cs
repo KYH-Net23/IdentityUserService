@@ -26,11 +26,21 @@ public class AdminService(SignInManager<IdentityUser> signInManager, UserManager
 
             if (!tryToSignIn.Succeeded)
             {
+                var counter = await userManager.GetAccessFailedCountAsync(loggedInUser);
+                await userManager.AccessFailedAsync(loggedInUser);
+                if (!await userManager.IsLockedOutAsync(loggedInUser))
+                    return new ResponseResult
+                    {
+                        Succeeded = false,
+                        Message = "Login failed"
+                    };
+                var lockoutEndDate = await userManager.GetLockoutEndDateAsync(loggedInUser);
                 return new ResponseResult
                 {
                     Succeeded = false,
-                    Message = "Login failed"
+                    Message = $"Too many attempts. Account temporarily locked until {lockoutEndDate}"
                 };
+
             }
 
             var userRole = await userManager.GetRolesAsync(loggedInUser!);
