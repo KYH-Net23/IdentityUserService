@@ -18,7 +18,7 @@ public static class CustomerRequestResponseFactory
         };
     }
 
-    public static List<CustomerRequestResponse> Create(List<Customer> listOfCustomers)
+    public static List<CustomerRequestResponse> Create(IList<Customer> listOfCustomers)
     {
         return listOfCustomers.Select(Create).ToList();
     }
