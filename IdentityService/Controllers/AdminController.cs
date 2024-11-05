@@ -44,7 +44,7 @@ public class AdminController(UserManager<IdentityUser> userManager) : Controller
             Email = model.Email,
             NormalizedEmail = model.Email.ToUpper(),
             PhoneNumber = model.PhoneNumber,
-            Address = model.Address
+            StreetAddress = model.Address
         };
 
         await userManager.CreateAsync(newCustomer, model.Password);

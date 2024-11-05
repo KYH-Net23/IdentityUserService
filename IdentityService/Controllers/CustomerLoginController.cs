@@ -47,7 +47,7 @@ public class CustomerLoginController(SignInManager<IdentityUser> signInManager, 
             Email = "customer@customer.se",
             NormalizedEmail = "customer@customer.se".ToUpper(),
             EmailConfirmed = true,
-            Address = "Tom adress"
+            StreetAddress = "Tom adress"
         };
 
         await userManager.CreateAsync(newUser, "Hejsan123#");
