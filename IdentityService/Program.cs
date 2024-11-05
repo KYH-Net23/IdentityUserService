@@ -12,29 +12,37 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
+builder.Services.AddCors(options =>
+{
+	options.AddPolicy("AllowSpecificOrigin",
+		builder => builder.AllowAnyOrigin()
+		.AllowAnyHeader()
+		.AllowAnyMethod());
+});
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc(
-        "v1",
-        new OpenApiInfo
-        {
-            Title = "Version 1",
-            Description = "Demo API with dummy data",
-            Version = "v1"
-        }
-    );
+	options.SwaggerDoc(
+		"v1",
+		new OpenApiInfo
+		{
+			Title = "Version 1",
+			Description = "Demo API with dummy data",
+			Version = "v1"
+		}
+	);
 
-    options.SwaggerDoc(
-        "v2",
-        new OpenApiInfo
-        {
-            Title = "Version 2",
-            Description = "Version 2, now with real data!",
-            Version = "v2"
-        }
-    );
+	options.SwaggerDoc(
+		"v2",
+		new OpenApiInfo
+		{
+			Title = "Version 2",
+			Description = "Version 2, now with real data!",
+			Version = "v2"
+		}
+	);
 });
 
 // var connectionString = builder.Configuration.GetConnectionString("IdentityServiceConnectionString");
@@ -44,15 +52,15 @@ builder.Services.AddDbContext<DataContext>(o => o.UseMySQL(builder.Configuration
 var vaultUri = new Uri($"{builder.Configuration["KeyVault"]!}");
 if (builder.Environment.IsDevelopment())
 {
-    builder.Configuration.AddAzureKeyVault(
-        vaultUri,
-        new VisualStudioCredential());
+	builder.Configuration.AddAzureKeyVault(
+		vaultUri,
+		new VisualStudioCredential());
 }
 else
 {
-    builder.Configuration.AddAzureKeyVault(
-        vaultUri,
-        new DefaultAzureCredential());
+	builder.Configuration.AddAzureKeyVault(
+		vaultUri,
+		new DefaultAzureCredential());
 }
 
 builder.Services.AddDataProtection();
@@ -63,13 +71,13 @@ builder.Services.AddScoped<AdminService>();
 // builder.Services.AddScoped<DataInitializer>();
 
 builder
-    .Services.AddIdentity<IdentityUser, IdentityRole>(options =>
-    {
-        options.Lockout.MaxFailedAccessAttempts = 3;
-        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);
-    })
-    .AddDefaultTokenProviders()
-    .AddEntityFrameworkStores<DataContext>();
+	.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+	{
+		options.Lockout.MaxFailedAccessAttempts = 3;
+		options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);
+	})
+	.AddDefaultTokenProviders()
+	.AddEntityFrameworkStores<DataContext>();
 
 var app = builder.Build();
 
@@ -88,11 +96,14 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Version 1 (dummy)");
-    c.SwaggerEndpoint("/swagger/v2/swagger.json", "Version 2 (the real deal!)");
+	c.SwaggerEndpoint("/swagger/v1/swagger.json", "Version 1 (dummy)");
+	c.SwaggerEndpoint("/swagger/v2/swagger.json", "Version 2 (the real deal!)");
 });
 
 app.UseHttpsRedirection();
+app.UseRouting();
+
+app.UseCors("AllowSpecificOrigin");
 
 app.UseAuthorization();
 

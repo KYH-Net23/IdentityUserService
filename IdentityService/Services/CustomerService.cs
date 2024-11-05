@@ -9,122 +9,126 @@ namespace IdentityService.Services;
 
 public class CustomerService(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
 {
-    public async Task<List<CustomerRequestResponse>> GetDemoCustomers()
-    {
-        var listOfCustomers = await userManager.GetUsersInRoleAsync(UserRoles.Customer.ToString());
+	public async Task<List<CustomerRequestResponse>> GetDemoCustomers()
+	{
+		var listOfCustomers = await userManager.GetUsersInRoleAsync(UserRoles.Customer.ToString());
 
-        var customerList = listOfCustomers.OfType<Customer>().ToList();
-        
-        return CustomerRequestResponseFactory.Create(customerList);
-    }
+		var customerList = listOfCustomers.OfType<Customer>().ToList();
 
-    public async Task<ResponseResult> CustomerLogin(LoginModel loginModel)
-    {
-        try
-        {
-            var loggedInUser = await userManager.FindByEmailAsync(loginModel.Email);
+		return CustomerRequestResponseFactory.Create(customerList);
+	}
 
-            if (loggedInUser == null)
-            {
-                return new ResponseResult
-                {
-                    Succeeded = false,
-                    Message = "User not found"
-                };
-            }
+	public async Task<ResponseResult> CustomerLogin(LoginModel loginModel)
+	{
+		try
+		{
+			var loggedInUser = await userManager.FindByEmailAsync(loginModel.Email);
 
-            var tryToSignIn =
-                await signInManager.PasswordSignInAsync(loggedInUser.UserName!, loginModel.Password, false, false);
+			if (loggedInUser == null)
+			{
+				return new ResponseResult
+				{
+					Succeeded = false,
+					Message = "User not found",
+					Content = "Content"
+				};
+			}
 
-            if (!tryToSignIn.Succeeded)
-            {
-                var counter = await userManager.GetAccessFailedCountAsync(loggedInUser);
-                await userManager.AccessFailedAsync(loggedInUser);
-                if (!await userManager.IsLockedOutAsync(loggedInUser))
-                    return new ResponseResult
-                    {
-                        Succeeded = false,
-                        Message = "Login failed"
-                    };
-                var lockoutEndDate = await userManager.GetLockoutEndDateAsync(loggedInUser);
-                return new ResponseResult
-                {
-                    Succeeded = false,
-                    Message = $"Too many attempts. Account temporarily locked until {lockoutEndDate}"
-                };
+			var tryToSignIn =
+				await signInManager.PasswordSignInAsync(loggedInUser.UserName!, loginModel.Password, false, false);
 
-            }
+			if (!tryToSignIn.Succeeded)
+			{
+				var counter = await userManager.GetAccessFailedCountAsync(loggedInUser);
+				await userManager.AccessFailedAsync(loggedInUser);
+				if (!await userManager.IsLockedOutAsync(loggedInUser))
+					return new ResponseResult
+					{
+						Succeeded = false,
+						Message = "Login failed",
+						Content = "Content"
+					};
+				var lockoutEndDate = await userManager.GetLockoutEndDateAsync(loggedInUser);
+				return new ResponseResult
+				{
+					Succeeded = false,
+					Message = $"Too many attempts. Account temporarily locked until {lockoutEndDate}",
+					Content = "Content"
+				};
 
-            var userRole = await userManager.GetRolesAsync(loggedInUser!);
+			}
 
-            return new ResponseResult
-            {
-                Succeeded = true,
-                Message = "Login successful",
-                Content = new
-                {
-                    loggedInUser.Id,
-                    loggedInUser.Email,
-                    Roles = userRole
-                }
-            };
-        }
-        catch (Exception e)
-        {
-            return new ResponseResult
-            {
-                Succeeded = false,
-                Message = e.Message
-            };
-        }
-    }
+			var userRole = await userManager.GetRolesAsync(loggedInUser!);
 
-    public async Task<ResponseResult> RegisterCustomer(CreateCustomerModel registerModel)
-    {
-        try
-        {
-            var existingUserName = await userManager.FindByNameAsync(registerModel.Username);
-            var existingEmail = await userManager.FindByEmailAsync(registerModel.Email);
+			return new ResponseResult
+			{
+				Succeeded = true,
+				Message = "Login successful",
+				Content = new
+				{
+					loggedInUser.Id,
+					loggedInUser.Email,
+					Roles = userRole
+				}
+			};
+		}
+		catch (Exception e)
+		{
+			return new ResponseResult
+			{
+				Succeeded = false,
+				Message = e.Message,
+				Content = "Content"
+			};
+		}
+	}
 
-            if (existingUserName != null || existingEmail != null)
-            {
-                return new ResponseResult
-                {
-                    Succeeded = false,
-                    Message = "User already exists"
-                };
-            }
+	public async Task<ResponseResult> RegisterCustomer(CreateCustomerModel registerModel)
+	{
+		try
+		{
+			var existingUserName = await userManager.FindByNameAsync(registerModel.Username);
+			var existingEmail = await userManager.FindByEmailAsync(registerModel.Email);
 
-            var newCustomer = new Customer
-            {
-                UserName = registerModel.Username,
-                NormalizedUserName = registerModel.Username.ToUpper(),
-                Email = registerModel.Email,
-                NormalizedEmail = registerModel.Email.ToUpper(),
-                PhoneNumber = registerModel.PhoneNumber,
-                StreetAddress = registerModel.StreetAddress,
-                DateOfBirth = registerModel.DateOfBirth,
-                City = registerModel.City,
-                AccountCreationDate = registerModel.AccountCreationDate,
-                LastActiveDate = registerModel.LastActiveDate
-            };
+			if (existingUserName != null || existingEmail != null)
+			{
+				return new ResponseResult
+				{
+					Succeeded = false,
+					Message = "User already exists"
+				};
+			}
 
-            await userManager.CreateAsync(newCustomer, registerModel.Password);
-            await userManager.AddToRoleAsync(newCustomer, UserRoles.Customer.ToString());
+			var newCustomer = new Customer
+			{
+				UserName = registerModel.Username,
+				NormalizedUserName = registerModel.Username.ToUpper(),
+				Email = registerModel.Email,
+				NormalizedEmail = registerModel.Email.ToUpper(),
+				PhoneNumber = registerModel.PhoneNumber,
+				StreetAddress = registerModel.StreetAddress,
+				DateOfBirth = registerModel.DateOfBirth,
+				City = registerModel.City,
+				AccountCreationDate = registerModel.AccountCreationDate,
+				LastActiveDate = registerModel.LastActiveDate
+			};
 
-            return new ResponseResult
-            {
-                Succeeded = true,
-                Message = "User created"
-            };
-        }
-        catch (Exception e)
-        {
-            return new ResponseResult
-            {
-                Succeeded = false,
-                Message = e.Message
-            };
-        }
-    }
+			await userManager.CreateAsync(newCustomer, registerModel.Password);
+			await userManager.AddToRoleAsync(newCustomer, UserRoles.Customer.ToString());
+
+			return new ResponseResult
+			{
+				Succeeded = true,
+				Message = "User created"
+			};
+		}
+		catch (Exception e)
+		{
+			return new ResponseResult
+			{
+				Succeeded = false,
+				Message = e.Message
+			};
+		}
+	}
 }

@@ -11,21 +11,33 @@ namespace IdentityService.Controllers;
 [ApiExplorerSettings(GroupName = "v2")]
 public class AdminLoginController(AdminService adminService) : ControllerBase
 {
-    [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginModel loginModel)
-    {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest("Modelstate invalid");
-        }
-        
-        var result = await adminService.AdminLogin(loginModel);
-        
-        if (result.Succeeded)
-        {
-            return Ok(result.Message);
-        }
-        
-        return BadRequest(result.Message);
-    }
+	[HttpPost("login")]
+	public async Task<IActionResult> Login([FromBody] LoginModel loginModel)
+	{
+		if (!ModelState.IsValid)
+		{
+			return BadRequest("Modelstate invalid");
+		}
+
+		var result = await adminService.AdminLogin(loginModel);
+
+		if (result.Succeeded)
+		{
+			return Ok(result.Message);
+		}
+
+		return BadRequest(result.Message);
+	}
+
+	[HttpPost("test")]
+	public async Task<IActionResult> Test([FromBody] LoginModel loginModel)
+	{
+		var result = new ResponseResult
+		{
+			Message = loginModel.Email,
+			Succeeded = true,
+			Content = loginModel
+		};
+		return Ok(result);
+	}
 }
