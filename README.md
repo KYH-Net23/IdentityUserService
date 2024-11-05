@@ -12,7 +12,6 @@ IdentityService is a microservice that provides identity management features, in
   - [Admin Login](#admin-login)
   - [Customer Login](#customer-login)
 - [User Roles](#user-roles)
-- [Security](#security)
 
 ---
 
@@ -130,11 +129,3 @@ Roles are managed by the `UserRoles` enum, which includes:
 - `Debug`
 
 ---
-
-## Security
-
-The IdentityService uses ASP.NET Core Identity with built-in security features for password hashing and role management. To enhance security:
-- Ensure HTTPS is used for all requests.
-- Store sensitive information (such as passwords and secret keys) securely, such as in [Azure Key Vault](https://azure.microsoft.com/services/key-vault/) or environment variables.
-  
-This service is set up to support role-based access control, limiting access to sensitive endpoints based on user roles.
