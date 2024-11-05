@@ -1,3 +1,4 @@
+using Azure.Identity;
 using IdentityService.Data;
 using IdentityService.Models;
 using IdentityService.Services;
@@ -36,7 +37,24 @@ builder.Services.AddSwaggerGen(options =>
     );
 });
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+// var connectionString = builder.Configuration.GetConnectionString("IdentityServiceConnectionString");
+
+builder.Services.AddDbContext<DataContext>(o => o.UseMySQL(builder.Configuration["IdentityServiceConnectionString"]!));
+
+var vaultUri = new Uri($"{builder.Configuration["KeyVault"]!}");
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddAzureKeyVault(
+        vaultUri,
+        new VisualStudioCredential());
+}
+else
+{
+    builder.Configuration.AddAzureKeyVault(
+        vaultUri,
+        new DefaultAzureCredential());
+}
+
 
 builder.Services.AddDataProtection();
 
@@ -49,11 +67,6 @@ builder
     .Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddDefaultTokenProviders()
     .AddEntityFrameworkStores<DataContext>();
-
-builder.Services.AddDbContext<DataContext>(o =>
-{
-    o.UseMySQL(connectionString!);
-});
 
 var app = builder.Build();
 
