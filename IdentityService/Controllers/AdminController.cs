@@ -11,7 +11,7 @@ namespace IdentityService.Controllers;
 [ApiExplorerSettings(GroupName = "v2")]
 public class AdminController(UserManager<IdentityUser> userManager) : ControllerBase
 {
-	[HttpGet("{email}")]
+	[HttpGet("{email:string}")]
 	public async Task<IActionResult> GetUser(string email)
 	{
 		var user = await userManager.FindByEmailAsync(email);
@@ -21,12 +21,6 @@ public class AdminController(UserManager<IdentityUser> userManager) : Controller
 		}
 
 		return BadRequest();
-	}
-
-	[HttpGet("Get/{userId:string}")]
-	public async Task<IActionResult> GetUser(string userId)
-	{
-		return Ok("List of users");
 	}
 
 	[HttpGet("GetAll")]
