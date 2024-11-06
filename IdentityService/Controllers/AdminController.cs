@@ -11,34 +11,28 @@ namespace IdentityService.Controllers;
 [ApiExplorerSettings(GroupName = "v2")]
 public class AdminController(UserManager<IdentityUser> userManager) : ControllerBase
 {
-    [HttpGet("{email}")]
-    public async Task<IActionResult> GetUser(string email)
-    {
-        var user = await userManager.FindByEmailAsync(email);
-        if (user != null)
-        {
-            return Ok(user.Email + user.UserName);
-        }
+	[HttpGet("{email}")]
+	public async Task<IActionResult> GetUser(string email)
+	{
+		var user = await userManager.FindByEmailAsync(email);
+		if (user != null)
+		{
+			return Ok(user.Email + user.UserName);
+		}
 
-        return BadRequest();
-    }
+		return BadRequest();
+	}
 
-    [HttpGet("")]
-    public async Task<IActionResult> GetUsers()
-    {
-        return Ok("List of users");
-    }
+	[HttpGet("")]
+	public async Task<IActionResult> GetUsers()
+	{
+		return Ok("List of users");
+	}
 
-    [HttpDelete("delete/{userId}")]
-    public async Task<IActionResult> DeleteUser(string userId)
-    {
-        return Ok("Ok. Not implemented yet.");
-    }
+	[HttpDelete("delete/{userId}")]
+	public async Task<IActionResult> DeleteUser(string userId)
+	{
+		return Ok("Ok. Not implemented yet.");
+	}
 }
 
-public enum UserRoles
-{
-    Admin,
-    Customer,
-    Debug
-}

@@ -1,4 +1,4 @@
-﻿using IdentityService.Models;
+﻿using IdentityService.Models.FormModels;
 using IdentityService.Services;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
@@ -10,9 +10,9 @@ namespace IdentityService.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 [ApiExplorerSettings(GroupName = "v2")]
-public class CustomerLoginController(CustomerService customerService) : ControllerBase
+public class LoginController(UserService userService) : ControllerBase
 {
-	[HttpPost("login")]
+	[HttpPost]
 	public async Task<IActionResult> Login([FromBody] LoginModel loginModel)
 	{
 		if (!ModelState.IsValid)
@@ -20,7 +20,7 @@ public class CustomerLoginController(CustomerService customerService) : Controll
 			return BadRequest(new { Message = "Model state invalid" });
 		}
 
-		var result = await customerService.CustomerLogin(loginModel);
+		var result = await userService.Login(loginModel);
 
 		if (result.Succeeded)
 		{
