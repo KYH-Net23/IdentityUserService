@@ -11,7 +11,7 @@ namespace IdentityService.Controllers;
 [ApiExplorerSettings(GroupName = "v2")]
 public class AdminController(UserManager<IdentityUser> userManager) : ControllerBase
 {
-	[HttpGet("{email:string}")]
+	[HttpGet("{email}")]
 	public async Task<IActionResult> GetUser(string email)
 	{
 		var user = await userManager.FindByEmailAsync(email);
@@ -29,7 +29,7 @@ public class AdminController(UserManager<IdentityUser> userManager) : Controller
 		return Ok("List of users");
 	}
 
-	[HttpDelete("delete/{userId:string}")]
+	[HttpDelete("delete/{userId}")]
 	public async Task<IActionResult> DeleteUser(string userId)
 	{
 		return Ok("Ok. Not implemented yet.");
