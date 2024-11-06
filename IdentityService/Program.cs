@@ -67,6 +67,7 @@ builder.Services.AddDataProtection();
 
 builder.Services.AddScoped<CustomerService>();
 builder.Services.AddScoped<AdminService>();
+builder.Services.AddScoped<UserService>();
 
 // builder.Services.AddScoped<DataInitializer>();
 
