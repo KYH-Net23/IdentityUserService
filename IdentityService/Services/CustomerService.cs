@@ -1,13 +1,17 @@
 ﻿using IdentityService.Controllers;
 using IdentityService.Data;
 using IdentityService.Factory;
+using IdentityService.Infrastructure;
 using IdentityService.Models;
+using IdentityService.Models.DataModels;
+using IdentityService.Models.FormModels;
+using IdentityService.Models.ResponseModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace IdentityService.Services;
 
-public class CustomerService(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
+public class CustomerService(UserManager<IdentityUser> userManager)
 {
 	public async Task<List<CustomerRequestResponse>> GetDemoCustomers()
 	{
@@ -16,71 +20,6 @@ public class CustomerService(SignInManager<IdentityUser> signInManager, UserMana
 		var customerList = listOfCustomers.OfType<Customer>().ToList();
 
 		return CustomerRequestResponseFactory.Create(customerList);
-	}
-
-	public async Task<ResponseResult> CustomerLogin(LoginModel loginModel)
-	{
-		try
-		{
-			var loggedInUser = await userManager.FindByEmailAsync(loginModel.Email);
-
-			if (loggedInUser == null)
-			{
-				return new ResponseResult
-				{
-					Succeeded = false,
-					Message = "User not found",
-					Content = "Content"
-				};
-			}
-
-			var tryToSignIn =
-				await signInManager.PasswordSignInAsync(loggedInUser.UserName!, loginModel.Password, false, false);
-
-			if (!tryToSignIn.Succeeded)
-			{
-				var counter = await userManager.GetAccessFailedCountAsync(loggedInUser);
-				await userManager.AccessFailedAsync(loggedInUser);
-				if (!await userManager.IsLockedOutAsync(loggedInUser))
-					return new ResponseResult
-					{
-						Succeeded = false,
-						Message = "Login failed",
-						Content = "Content"
-					};
-				var lockoutEndDate = await userManager.GetLockoutEndDateAsync(loggedInUser);
-				return new ResponseResult
-				{
-					Succeeded = false,
-					Message = $"Too many attempts. Account temporarily locked until {lockoutEndDate}",
-					Content = "Content"
-				};
-
-			}
-
-			var userRole = await userManager.GetRolesAsync(loggedInUser!);
-
-			return new ResponseResult
-			{
-				Succeeded = true,
-				Message = "Login successful",
-				Content = new
-				{
-					loggedInUser.Id,
-					loggedInUser.Email,
-					Roles = userRole
-				}
-			};
-		}
-		catch (Exception e)
-		{
-			return new ResponseResult
-			{
-				Succeeded = false,
-				Message = e.Message,
-				Content = "Content"
-			};
-		}
 	}
 
 	public async Task<ResponseResult> RegisterCustomer(CreateCustomerModel registerModel)
