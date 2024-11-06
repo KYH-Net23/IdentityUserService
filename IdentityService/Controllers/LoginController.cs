@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace IdentityService.Controllers;
 
-[Route("api/[controller]")]
+[Route("[controller]")]
 [ApiController]
 [ApiExplorerSettings(GroupName = "v2")]
 public class LoginController(UserService userService) : ControllerBase

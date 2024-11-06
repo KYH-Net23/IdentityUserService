@@ -405,3 +405,4 @@ FodyWeavers.xsd
 /.idea/dataSources.xml
 /IdentityService/Migrations/
 /.idea/modules.xml
+/IdentityService/.idea

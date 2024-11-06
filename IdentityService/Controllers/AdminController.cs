@@ -23,13 +23,19 @@ public class AdminController(UserManager<IdentityUser> userManager) : Controller
 		return BadRequest();
 	}
 
-	[HttpGet("")]
+	[HttpGet("Get/{userId:string}")]
+	public async Task<IActionResult> GetUser(string userId)
+	{
+		return Ok("List of users");
+	}
+
+	[HttpGet("GetAll")]
 	public async Task<IActionResult> GetUsers()
 	{
 		return Ok("List of users");
 	}
 
-	[HttpDelete("delete/{userId}")]
+	[HttpDelete("delete/{userId:string}")]
 	public async Task<IActionResult> DeleteUser(string userId)
 	{
 		return Ok("Ok. Not implemented yet.");
