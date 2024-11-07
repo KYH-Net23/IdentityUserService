@@ -79,4 +79,45 @@ public class UserServiceTests
             }
         }
     }
+    
+    [Fact]
+    public async Task Login_Succeeds_With_Correct_Credentials()
+    {
+        // Arrange
+        var loginModel = new LoginModel
+        {
+            Email = "admin@test.com",
+            Password = "correctpassword"
+        };
+
+        var user = new IdentityUser { Email = loginModel.Email, UserName = "adminuser" };
+
+        _mockUserManager.Setup(x => x.FindByEmailAsync(loginModel.Email))
+            .ReturnsAsync(user);
+
+        _mockSignInManager.Setup(x => x.PasswordSignInAsync(user.UserName, loginModel.Password, false, false))
+            .ReturnsAsync(SignInResult.Success);
+
+        _mockUserManager.Setup(x => x.GetRolesAsync(user))
+            .ReturnsAsync(new List<string> { "Admin" });
+
+        // Act
+        var result = await _userService.Login(loginModel);
+
+        // Assert
+        Assert.True(result.Succeeded);
+        Assert.Equal("Login successful", result.Message);
+        Assert.NotNull(result.Content);
+
+        var content = result.Content;
+        var idProperty = content.GetType().GetProperty("Id");
+        var emailProperty = content.GetType().GetProperty("Email");
+        var rolesProperty = content.GetType().GetProperty("Roles");
+
+        Assert.Equal(user.Id, idProperty!.GetValue(content) as string);
+        Assert.Equal(user.Email, emailProperty!.GetValue(content) as string);
+        Assert.Contains("Admin", (IList<string>)rolesProperty?.GetValue(content)!);
+    }
+
+
 }
