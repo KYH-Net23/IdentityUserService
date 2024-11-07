@@ -1,15 +1,13 @@
-﻿using IdentityService.Models;
-using Microsoft.AspNetCore.Authorization;
+﻿using IdentityService.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IdentityService.Controllers;
 
-[Authorize(Roles = "Admin")]
 [ApiController]
 [Route("[controller]")]
 [ApiExplorerSettings(GroupName = "v2")]
-public class AdminController(UserManager<IdentityUser> userManager) : ControllerBase
+public class AdminController(UserManager<IdentityUser> userManager, AdminService adminService) : ControllerBase
 {
 	[HttpGet("{email}")]
 	public async Task<IActionResult> GetUser(string email)
@@ -23,10 +21,11 @@ public class AdminController(UserManager<IdentityUser> userManager) : Controller
 		return BadRequest();
 	}
 
-	[HttpGet("GetAll")]
-	public async Task<IActionResult> GetUsers()
+	[HttpGet("GetAdmins")]
+	public async Task<IActionResult> GetAdmins()
 	{
-		return Ok("List of users");
+		var listOfAdmins = await adminService.GetAdmins();
+		return Ok(listOfAdmins);
 	}
 
 	[HttpDelete("delete/{userId}")]

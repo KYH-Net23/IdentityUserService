@@ -1,12 +1,19 @@
-﻿using IdentityService.Data;
-using IdentityService.Models;
-using IdentityService.Models.FormModels;
+﻿using IdentityService.Factory;
+using IdentityService.Infrastructure;
+using IdentityService.Models.DataModels;
+using IdentityService.Models.ResponseModels;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace IdentityService.Services;
 
 public class AdminService(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
 {
-	// Add methods to AdminController here
+	public async Task<List<AdminRequestResponse>> GetAdmins()
+	{
+		var listOfAdmins = await userManager.GetUsersInRoleAsync(UserRoles.Admin.ToString());
+
+		var adminList = listOfAdmins.OfType<Admin>().ToList();
+
+		return AdminRequestResponseFactory.Create(adminList);
+	}
 }

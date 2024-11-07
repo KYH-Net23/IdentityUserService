@@ -1,4 +1,6 @@
-﻿namespace IdentityService.Models.ResponseModels;
+﻿using IdentityService.Infrastructure;
+
+namespace IdentityService.Models.ResponseModels;
 
 public class CustomerRequestResponse
 {
@@ -10,4 +12,5 @@ public class CustomerRequestResponse
 	public string? PhoneNumber { get; set; }
 	public string Username { get; set; } = null!;
 	public bool IsDeleted { get; set; }
+	public string UserRole => UserRoles.Customer.ToString();
 }
