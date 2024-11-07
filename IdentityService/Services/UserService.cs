@@ -6,7 +6,7 @@ namespace IdentityService.Services
 {
 	public class UserService(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
 	{
-		public async Task<ResponseResult> Login(LoginModel loginModel)
+		public async Task<ResponseResult> Login(LoginModel loginModel, bool rememberMe = false)
 		{
 			try
 			{
@@ -23,7 +23,7 @@ namespace IdentityService.Services
 				}
 
 				var tryToSignIn =
-					await signInManager.PasswordSignInAsync(loggedInUser.UserName!, loginModel.Password, false, false);
+					await signInManager.PasswordSignInAsync(loggedInUser.UserName!, loginModel.Password, rememberMe, false);
 
 				if (!tryToSignIn.Succeeded)
 				{

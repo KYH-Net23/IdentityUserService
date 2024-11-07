@@ -140,5 +140,35 @@ public class UserServiceTests
         Assert.Equal("User not found", result.Message);
         Assert.Equal("User not found", result.Content);
     }
+    
+    [Fact]
+    public async Task Login_With_RememberMe_Keeps_User_Signed_In()
+    {
+        // Arrange
+        var loginModel = new LoginModel
+        {
+            Email = "admin@test.com",
+            Password = "validpassword"
+        };
+
+        var user = new IdentityUser { Email = loginModel.Email, UserName = "adminuser" };
+
+        _mockUserManager.Setup(x => x.FindByEmailAsync(loginModel.Email))
+            .ReturnsAsync(user);
+
+        const bool rememberMe = true;
+        _mockSignInManager.Setup(x => x.PasswordSignInAsync(user.UserName, loginModel.Password, rememberMe, false))
+            .ReturnsAsync(SignInResult.Success);
+
+        // Act
+        var result = await _userService.Login(loginModel, rememberMe);
+
+        // Assert
+        Assert.True(result.Succeeded);
+        Assert.Equal("Login successful", result.Message);
+
+        _mockSignInManager.Verify(x => x.PasswordSignInAsync(user.UserName, loginModel.Password, rememberMe, false), Times.Once);
+    }
+
 
 }
