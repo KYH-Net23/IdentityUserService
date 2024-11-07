@@ -118,6 +118,27 @@ public class UserServiceTests
         Assert.Equal(user.Email, emailProperty!.GetValue(content) as string);
         Assert.Contains("Admin", (IList<string>)rolesProperty?.GetValue(content)!);
     }
+    
+    [Fact]
+    public async Task Login_Fails_When_User_Does_Not_Exist_In_Database()
+    {
+        // Arrange
+        var loginModel = new LoginModel
+        {
+            Email = "nonexistent@admin.com",
+            Password = "fakepassword"
+        };
 
+        _mockUserManager.Setup(x => x.FindByEmailAsync(loginModel.Email))
+            .ReturnsAsync((IdentityUser)null!);
+
+        // Act
+        var result = await _userService.Login(loginModel);
+
+        // Assert
+        Assert.False(result.Succeeded);
+        Assert.Equal("User not found", result.Message);
+        Assert.Equal("User not found", result.Content);
+    }
 
 }
