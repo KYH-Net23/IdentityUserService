@@ -33,8 +33,8 @@ namespace IdentityService.Services
 						return new ResponseResult
 						{
 							Succeeded = false,
-							Message = "Login failed",
-							Content = "Login failed"
+							Message = "Invalid login attempt",
+							Content = "Invalid login attempt"
 						};
 					var lockoutEndDate = await userManager.GetLockoutEndDateAsync(loggedInUser);
 					return new ResponseResult
