@@ -1,5 +1,6 @@
 ﻿using IdentityService.Models.FormModels;
-using IdentityService.Models;
+using IdentityService.Models.DataModels;
+using IdentityService.Models.ResponseModels;
 using Microsoft.AspNetCore.Identity;
 
 namespace IdentityService.Services
@@ -17,17 +18,15 @@ namespace IdentityService.Services
 					return new ResponseResult
 					{
 						Succeeded = false,
-						Message = "User not found",
-						Content = "User not found"
+						Message = $"User \"{loginModel.Email}\" not found",
+						Content = $"User \"{loginModel.Email}\" not found"
 					};
 				}
 
-				var tryToSignIn =
-					await signInManager.PasswordSignInAsync(loggedInUser.UserName!, loginModel.Password, rememberMe, false);
+				var tryToSignIn = await signInManager.PasswordSignInAsync(loggedInUser.UserName!, loginModel.Password, rememberMe, false);
 
 				if (!tryToSignIn.Succeeded)
 				{
-					var counter = await userManager.GetAccessFailedCountAsync(loggedInUser);
 					await userManager.AccessFailedAsync(loggedInUser);
 					if (!await userManager.IsLockedOutAsync(loggedInUser))
 						return new ResponseResult
@@ -46,7 +45,12 @@ namespace IdentityService.Services
 
 				}
 
-				var userRole = await userManager.GetRolesAsync(loggedInUser!);
+				var userRole = await userManager.GetRolesAsync(loggedInUser);
+				if (loggedInUser is Customer customer)
+				{
+					customer.LastActiveDate = DateTime.Now;
+					await userManager.UpdateAsync(customer);
+				}
 
 				return new ResponseResult
 				{
