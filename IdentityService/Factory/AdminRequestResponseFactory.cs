@@ -3,7 +3,7 @@ using IdentityService.Models.ResponseModels;
 
 namespace IdentityService.Factory;
 
-public class AdminRequestResponseFactory
+public static class AdminRequestResponseFactory
 {
     public static AdminRequestResponse Create(Admin admin)
     {
