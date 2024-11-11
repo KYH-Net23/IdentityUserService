@@ -33,14 +33,14 @@ public class CustomerController(CustomerService customerService) : ControllerBas
 
 			if (result.Succeeded)
 			{
-				return Ok(result.Message);
+				return Ok(new {result.Message});
 			}
 
 			return BadRequest(new {result});
 		}
 		catch (Exception e)
 		{
-			return BadRequest(e.Message);
+			return BadRequest(new{e.Message});
 		}
 	}
 }
