@@ -1,8 +1,5 @@
 ﻿using IdentityService.Models.FormModels;
 using IdentityService.Services;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IdentityService.Controllers;
@@ -27,6 +24,6 @@ public class LoginController(UserService userService) : ControllerBase
 			return Ok(new { result.Message, result.Content });
 		}
 
-		return BadRequest(new { result.Message });
+		return BadRequest(new { result });
 	}
 }
