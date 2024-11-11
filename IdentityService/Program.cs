@@ -1,6 +1,5 @@
 using Azure.Identity;
 using IdentityService.Data;
-using IdentityService.Models;
 using IdentityService.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -8,19 +7,18 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
+builder.Services.Configure<AuthorizationSettings>(builder.Configuration.GetSection("AuthorizationSettings"));
 
 builder.Services.AddCors(options =>
 {
 	options.AddPolicy("AllowSpecificOrigin",
-		policyBuilder => policyBuilder.AllowAnyOrigin()
+		policyBuilder => policyBuilder.WithOrigins("http://localhost:5173", "https://localhost:5173","https://localhost:7266")
 		.AllowAnyHeader()
-		.AllowAnyMethod());
+		.AllowAnyMethod()
+		.AllowCredentials());
 });
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -45,8 +43,6 @@ builder.Services.AddSwaggerGen(options =>
 	);
 });
 
-// var connectionString = builder.Configuration.GetConnectionString("IdentityServiceConnectionString");
-
 builder.Services.AddDbContext<DataContext>(o => o.UseMySQL(builder.Configuration["IdentityServiceConnectionString"]!));
 
 var vaultUri = new Uri($"{builder.Configuration["KeyVault"]!}");
@@ -68,8 +64,6 @@ builder.Services.AddDataProtection();
 builder.Services.AddScoped<CustomerService>();
 builder.Services.AddScoped<AdminService>();
 builder.Services.AddScoped<UserService>();
-
-// builder.Services.AddScoped<DataInitializer>();
 
 builder
 	.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
@@ -97,8 +91,8 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-	c.SwaggerEndpoint("/swagger/v1/swagger.json", "Version 1 (dummy)");
-	c.SwaggerEndpoint("/swagger/v2/swagger.json", "Version 2 (the real deal!)");
+	c.SwaggerEndpoint("/swagger/v2/swagger.json", "Version 2");
+	c.SwaggerEndpoint("/swagger/v3/swagger.json", "Version 3");
 });
 
 app.UseHttpsRedirection();
@@ -106,6 +100,7 @@ app.UseRouting();
 
 app.UseCors("AllowSpecificOrigin");
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
