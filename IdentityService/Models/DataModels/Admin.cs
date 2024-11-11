@@ -3,9 +3,6 @@ using IdentityService.Infrastructure;
 using Microsoft.AspNetCore.Identity;
 
 namespace IdentityService.Models.DataModels;
-
-
-
 public class Admin : IdentityUser
 {
 	[Range(0, 2)]
