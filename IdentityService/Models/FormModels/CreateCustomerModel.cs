@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using IdentityService.Infrastructure;
-using IdentityService.Models;
 
 namespace IdentityService.Models.FormModels;
 
