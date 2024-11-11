@@ -28,9 +28,16 @@ public class AdminController(UserManager<IdentityUser> userManager, AdminService
 		return Ok(listOfAdmins);
 	}
 
-	[HttpDelete("delete/{userId}")]
-	public async Task<IActionResult> DeleteUser(string userId)
+	[HttpDelete("delete")]
+	public async Task<IActionResult> DeleteUser()
 	{
+		var userRole = HttpContext.Items["UserRole"] as string;
+		var isAuthenticated = HttpContext.Items["IsAuthenticated"] as bool? ?? false;
+
+		if (userRole != "Admin" || !isAuthenticated)
+		{
+			return Forbid();
+		}
 		return Ok("Ok. Not implemented yet.");
 	}
 }
