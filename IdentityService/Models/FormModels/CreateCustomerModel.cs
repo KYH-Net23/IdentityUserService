@@ -13,9 +13,10 @@ public class CreateCustomerModel
 
 	[Required]
 	[StringLength(50, MinimumLength = 5, ErrorMessage = "Email must be between 5 and 50 characters")]
-	// [RegularExpression(@"^[\w.-]+@[a-zA-Z\d.-]+.[a-zA-Z]{2,}$", ErrorMessage = "Invalid email format.")]
+	[EmailAddress]
 	public string Email { get; set; } = null!;
 
+	[JsonIgnore]
 	public bool EmailConfirmed { get; set; } = true;
 
 	[Required]
@@ -31,7 +32,7 @@ public class CreateCustomerModel
 	public string StreetAddress { get; set; } = null!;
 
 	[StringLength(50, MinimumLength = 5, ErrorMessage = "City must be between 5 and 50 characters")]
-	public string? City { get; set; }
+	public string City { get; set; } = null!;
 
 	[Required]
 	[MinimumAge]
