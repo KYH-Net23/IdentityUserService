@@ -1,13 +1,10 @@
-﻿using IdentityService.Controllers;
-using IdentityService.Data;
+﻿using IdentityService.Extensions;
 using IdentityService.Factory;
 using IdentityService.Infrastructure;
-using IdentityService.Models;
 using IdentityService.Models.DataModels;
 using IdentityService.Models.FormModels;
 using IdentityService.Models.ResponseModels;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace IdentityService.Services;
 
@@ -38,20 +35,7 @@ public class CustomerService(UserManager<IdentityUser> userManager)
 				};
 			}
 
-			var newCustomer = new Customer
-			{
-				UserName = registerModel.Username,
-				NormalizedUserName = registerModel.Username.ToUpper(),
-				Email = registerModel.Email,
-				NormalizedEmail = registerModel.Email.ToUpper(),
-				PhoneNumber = registerModel.PhoneNumber,
-				StreetAddress = registerModel.StreetAddress,
-				DateOfBirth = registerModel.DateOfBirth,
-				City = registerModel.City,
-				AccountCreationDate = registerModel.AccountCreationDate,
-				LastActiveDate = registerModel.LastActiveDate
-			};
-
+			var newCustomer = registerModel.MapToCustomer();
 			var result = await userManager.CreateAsync(newCustomer, registerModel.Password);
 
 			if (!result.Succeeded)
