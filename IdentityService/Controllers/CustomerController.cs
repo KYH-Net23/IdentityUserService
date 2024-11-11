@@ -36,7 +36,7 @@ public class CustomerController(CustomerService customerService) : ControllerBas
 				return Ok(result.Message);
 			}
 
-			return BadRequest(result.Message);
+			return BadRequest(new {result});
 		}
 		catch (Exception e)
 		{

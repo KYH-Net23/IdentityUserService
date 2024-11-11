@@ -52,7 +52,18 @@ public class CustomerService(UserManager<IdentityUser> userManager)
 				LastActiveDate = registerModel.LastActiveDate
 			};
 
-			await userManager.CreateAsync(newCustomer, registerModel.Password);
+			var result = await userManager.CreateAsync(newCustomer, registerModel.Password);
+
+			if (!result.Succeeded)
+			{
+				var errors = result.Errors.Select(e => e.Description).ToList();
+				return new ResponseResult
+				{
+					Succeeded = false,
+					Message = "User creation failed",
+					Content = errors
+				};
+			}
 			await userManager.AddToRoleAsync(newCustomer, UserRoles.Customer.ToString());
 
 			return new ResponseResult
