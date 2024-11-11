@@ -9,13 +9,6 @@ namespace IdentityService.Controllers;
 [ApiController]
 public class CustomerController(CustomerService customerService) : ControllerBase
 {
-	[ApiExplorerSettings(GroupName = "v1")]
-	[HttpGet("[action]")]
-	public async Task<IActionResult> GetAll()
-	{
-		return Ok(await customerService.GetDemoCustomers());
-	}
-
 	[ApiExplorerSettings(GroupName = "v2")]
 	[HttpGet("[action]")]
 	public async Task<IEnumerable<CustomerRequestResponse>> GetCustomers()
@@ -32,7 +25,8 @@ public class CustomerController(CustomerService customerService) : ControllerBas
 		{
 			if (!ModelState.IsValid)
 			{
-				return BadRequest("Modelstate invalid");
+				var errors = ModelState.Values.SelectMany(v => v.Errors);
+				return BadRequest(new {errors});
 			}
 
 			var result = await customerService.RegisterCustomer(registerModel);
