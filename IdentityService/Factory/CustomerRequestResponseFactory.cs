@@ -15,6 +15,7 @@ public static class CustomerRequestResponseFactory
 			DateOfBirth = customer.DateOfBirth,
 			Email = customer.Email!,
 			PhoneNumber = customer.PhoneNumber!,
+			PostalCode = customer.PostalCode,
 			Username = customer.UserName!,
 			IsDeleted = customer.IsDeleted
 		};

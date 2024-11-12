@@ -10,6 +10,7 @@ public class CustomerRequestResponse
 	public DateTime DateOfBirth { get; set; }
 	public string Email { get; set; } = null!;
 	public string PhoneNumber { get; set; } = null!;
+	public string PostalCode { get; set; } = null!;
 	public string Username { get; set; } = null!;
 	public bool IsDeleted { get; set; }
 	public string UserRole => UserRoles.Customer.ToString();

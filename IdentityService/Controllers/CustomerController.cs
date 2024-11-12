@@ -21,14 +21,13 @@ public class CustomerController(CustomerService customerService) : ControllerBas
 	[HttpPost("[action]")]
 	public async Task<IActionResult> Register([FromBody] CreateCustomerModel registerModel)
 	{
+		if (!ModelState.IsValid)
+		{
+			var errors = ModelState.Values.SelectMany(v => v.Errors);
+			return BadRequest(new {errors});
+		}
 		try
 		{
-			if (!ModelState.IsValid)
-			{
-				var errors = ModelState.Values.SelectMany(v => v.Errors);
-				return BadRequest(new {errors});
-			}
-
 			var result = await customerService.RegisterCustomer(registerModel);
 
 			if (result.Succeeded)
