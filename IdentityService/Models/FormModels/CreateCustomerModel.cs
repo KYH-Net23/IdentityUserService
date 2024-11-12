@@ -27,6 +27,10 @@ public class CreateCustomerModel
 	public string PhoneNumber { get; set; } = null!;
 
 	[Required]
+	[StringLength(20, MinimumLength = 2, ErrorMessage = "Name must be between 2 and 20 characters")]
+	public string PostalCode { get; set; } = null!;
+
+	[Required]
 	[StringLength(50, MinimumLength = 5, ErrorMessage = "Address must be between 5 and 50 characters")]
 	public string StreetAddress { get; set; } = null!;
 
