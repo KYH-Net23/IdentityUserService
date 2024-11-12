@@ -18,6 +18,7 @@ public static class CustomerExtensions
             City = source.City,
             DateOfBirth = source.DateOfBirth,
             AccountCreationDate = DateTime.Now,
+            PostalCode = source.PostalCode,
             IsDeleted = false
         };
     }
