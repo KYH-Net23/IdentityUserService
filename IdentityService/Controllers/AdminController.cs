@@ -6,7 +6,6 @@ namespace IdentityService.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-[ApiExplorerSettings(GroupName = "v2")]
 public class AdminController(UserManager<IdentityUser> userManager, AdminService adminService) : ControllerBase
 {
 	[HttpGet("{email}")]

@@ -26,8 +26,8 @@ public class CreateCustomerModel
 	[StringLength(50, MinimumLength = 5, ErrorMessage = "Phone number must be between 5 and 50 characters")]
 	public string PhoneNumber { get; set; } = null!;
 
-	[Required]
-	[StringLength(20, MinimumLength = 5, ErrorMessage = "Name must be between 5 and 20 characters")]
+	[StringLength(5)]
+	[RegularExpression(@"^\d{5}$", ErrorMessage = "Please enter exactly 5 digits.")]
 	public string PostalCode { get; set; } = null!;
 
 	[Required]

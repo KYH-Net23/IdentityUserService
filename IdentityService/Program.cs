@@ -1,13 +1,16 @@
+using Asp.Versioning;
 using Azure.Identity;
 using IdentityService.Data;
 using IdentityService.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+builder.Services.AddOpenApi();
 builder.Services.Configure<AuthorizationSettings>(builder.Configuration.GetSection("AuthorizationSettings"));
 
 builder.Services.AddCors(options =>
@@ -20,27 +23,11 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
+builder.Services.AddApiVersioning(options =>
 {
-	options.SwaggerDoc(
-		"v1",
-		new OpenApiInfo
-		{
-			Title = "Version 1",
-			Description = "Demo API with dummy data",
-			Version = "v1"
-		}
-	);
-
-	options.SwaggerDoc(
-		"v2",
-		new OpenApiInfo
-		{
-			Title = "Version 2",
-			Description = "Version 2, now with real data!",
-			Version = "v2"
-		}
-	);
+	options.DefaultApiVersion = new ApiVersion(2, 0);
+	options.AssumeDefaultVersionWhenUnspecified = true;
+	options.ReportApiVersions = true;
 });
 
 builder.Services.AddDbContext<DataContext>(o => o.UseMySQL(builder.Configuration["IdentityServiceConnectionString"]!));
@@ -88,11 +75,11 @@ var app = builder.Build();
 //     await dataInitializer.SeedUserRoles();
 // }
 
-app.UseSwagger();
-app.UseSwaggerUI(c =>
+app.MapOpenApi();
+app.MapScalarApiReference(options =>
 {
-	c.SwaggerEndpoint("/swagger/v2/swagger.json", "Version 2");
-	c.SwaggerEndpoint("/swagger/v3/swagger.json", "Version 3");
+	options.WithTheme(ScalarTheme.Mars)
+		.WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
 });
 
 app.UseHttpsRedirection();

@@ -6,7 +6,6 @@ namespace IdentityService.Controllers;
 
 [Route("[controller]")]
 [ApiController]
-[ApiExplorerSettings(GroupName = "v2")]
 public class LoginController(UserService userService) : ControllerBase
 {
 	[HttpPost]

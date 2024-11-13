@@ -9,15 +9,12 @@ namespace IdentityService.Controllers;
 [ApiController]
 public class CustomerController(CustomerService customerService) : ControllerBase
 {
-	[ApiExplorerSettings(GroupName = "v2")]
 	[HttpGet("[action]")]
 	public async Task<IEnumerable<CustomerRequestResponse>> GetCustomers()
 	{
 		return await customerService.GetDemoCustomers();
 	}
 
-
-	[ApiExplorerSettings(GroupName = "v2")]
 	[HttpPost("[action]")]
 	public async Task<IActionResult> Register([FromBody] CreateCustomerModel registerModel)
 	{
