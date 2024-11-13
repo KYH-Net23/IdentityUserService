@@ -16,7 +16,8 @@ public class Customer : IdentityUser
 	[StringLength(100, MinimumLength = 2, ErrorMessage = "First name must be between 2 and 100 characters")]
 	public string City { get; set; } = null!;
 	[Required]
-	[StringLength(20, MinimumLength = 5, ErrorMessage = "First name must be between 5 and 20 characters")]
+	[StringLength(5)]
+	[RegularExpression(@"^\d{5}$", ErrorMessage = "Please enter exactly 5 digits.")]
 	public string PostalCode { get; set; } = null!;
 	[Required]
 	public DateTime DateOfBirth { get; set; }

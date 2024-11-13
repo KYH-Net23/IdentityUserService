@@ -35,7 +35,7 @@ public class CustomerController(CustomerService customerService) : ControllerBas
 				return Ok(new {result.Message});
 			}
 
-			return BadRequest(new {Password = result.Content});
+			return BadRequest(new {PasswordErrors = result.Content});
 		}
 		catch (Exception e)
 		{
