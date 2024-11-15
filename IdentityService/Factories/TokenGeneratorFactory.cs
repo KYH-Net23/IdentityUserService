@@ -3,7 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
-namespace IdentityService.Factory;
+namespace IdentityService.Factories;
 
 public static class TokenGeneratorFactory
 {
@@ -12,7 +12,8 @@ public static class TokenGeneratorFactory
     public static string GenerateAccessToken(string secretKey)
     {
         var key = Encoding.UTF8.GetBytes(secretKey);
-        var claims = new List<Claim> { new(JwtRegisteredClaimNames.Sub, "IdentityProvider") };
+        // var claims = new List<Claim> { new(JwtRegisteredClaimNames.Sub, "IdentityProvider") };
+        var claims = new List<Claim> { new(JwtRegisteredClaimNames.Name, "https://www.rika.se") };
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {

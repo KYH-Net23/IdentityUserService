@@ -1,7 +1,7 @@
 ﻿using IdentityService.Models.DataModels;
 using IdentityService.Models.ResponseModels;
 
-namespace IdentityService.Factory;
+namespace IdentityService.Factories;
 
 public static class AdminRequestResponseFactory
 {

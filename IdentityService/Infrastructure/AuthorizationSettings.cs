@@ -1,4 +1,4 @@
-﻿namespace IdentityService;
+﻿namespace IdentityService.Infrastructure;
 
 public class AuthorizationSettings
 {
