@@ -4,16 +4,8 @@ using Moq;
 
 namespace IdentityService.Tests;
 
-public class RegisterCustomerTests : IClassFixture<UserManagerFixture>
+public class RegisterCustomerTests(UserManagerFixture fixture) : IClassFixture<UserManagerFixture>
 {
-
-    private readonly UserManagerFixture _fixture;
-
-    public RegisterCustomerTests(UserManagerFixture fixture)
-    {
-        _fixture = fixture;
-    }
-
     [Fact]
     public async Task RegisterCustomer_Success()
     {
@@ -24,18 +16,20 @@ public class RegisterCustomerTests : IClassFixture<UserManagerFixture>
             Password = "Test123#",
             PhoneNumber = "123123123",
             StreetAddress = "Some street address",
-            City = "Some city",
+            City = "Some city"
         };
 
-        _fixture.UserManagerMock
-            .Setup(userManager => userManager.CreateAsync(It.IsAny<IdentityUser>(), It.IsAny<string>()))
+        fixture
+            .UserManagerMock.Setup(userManager =>
+                userManager.CreateAsync(It.IsAny<IdentityUser>(), It.IsAny<string>())
+            )
             .ReturnsAsync(IdentityResult.Success);
 
-        var result = await _fixture.CustomerService.RegisterCustomer(userModel);
+        var result = await fixture.CustomerService.RegisterCustomer(userModel);
 
         Assert.True(result.Succeeded);
         Assert.Equal("User created", result.Message);
-        Assert.Null(result.Content);
+        Assert.NotNull(result.Content);
     }
 
     [Fact]
@@ -45,17 +39,19 @@ public class RegisterCustomerTests : IClassFixture<UserManagerFixture>
         {
             Username = "TestUser",
             Email = "TestUser@gmail.com",
-            Password = "Test123#",
+            Password = "bad",
             PhoneNumber = "123123123",
             StreetAddress = "Some street address",
             City = "Some city",
         };
 
-        _fixture.UserManagerMock
-            .Setup(userManager => userManager.CreateAsync(It.IsAny<IdentityUser>(), It.IsAny<string>()))
+        fixture
+            .UserManagerMock.Setup(userManager =>
+                userManager.CreateAsync(It.IsAny<IdentityUser>(), userModel.Password)
+            )
             .ReturnsAsync(IdentityResult.Failed());
 
-        var result = await _fixture.CustomerService.RegisterCustomer(userModel);
+        var result = await fixture.CustomerService.RegisterCustomer(userModel);
 
         Assert.False(result.Succeeded);
         Assert.Equal("User creation failed", result.Message);
