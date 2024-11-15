@@ -1,5 +1,5 @@
 ﻿using IdentityService.Extensions;
-using IdentityService.Factory;
+using IdentityService.Factories;
 using IdentityService.Infrastructure;
 using IdentityService.Models.DataModels;
 using IdentityService.Models.FormModels;
