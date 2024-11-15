@@ -1,11 +1,9 @@
 using Asp.Versioning;
 using Azure.Identity;
-using IdentityService;
 using IdentityService.Data;
-using IdentityService.Extensions;
+using IdentityService.Infrastructure;
 using IdentityService.Services;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
@@ -55,6 +53,7 @@ builder.Services.AddDbContext<DataContext>(o =>
 );
 
 var vaultUri = new Uri($"{builder.Configuration["KeyVault"]!}");
+
 if (builder.Environment.IsDevelopment())
 {
     builder.Configuration.AddAzureKeyVault(vaultUri, new VisualStudioCredential());
@@ -71,11 +70,9 @@ builder.Services.AddScoped<AdminService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddHttpClient<AzureEmailSender>(client =>
 {
-    client.BaseAddress = new Uri("https://localhost");
+    client.BaseAddress = new Uri("https://rika-solutions-email-provider.azurewebsites.net");
     client.DefaultRequestHeaders.Add("Accept", "application/json");
 });
-
-builder.Services.AddTransient<IEmailSender, AzureEmailSender>();
 
 builder
     .Services.AddIdentity<IdentityUser, IdentityRole>(options =>
