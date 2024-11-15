@@ -1,5 +1,4 @@
-﻿using Asp.Versioning;
-using IdentityService.Models.FormModels;
+﻿using IdentityService.Models.FormModels;
 using IdentityService.Models.ResponseModels;
 using IdentityService.Services;
 using Microsoft.AspNetCore.Identity;
@@ -7,20 +6,18 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace IdentityService.Controllers;
 
-[ApiVersion("1.0")]
-[ApiVersion("2.0")]
-[Route("/v{version:apiVersion}/[controller]")]
+[Route("/[controller]/[action]")]
 [ApiController]
 public class CustomerController(CustomerService customerService, AzureEmailSender azureEmailSender)
     : ControllerBase
 {
-    [HttpGet("[action]")]
+    [HttpGet("")]
     public async Task<IEnumerable<CustomerRequestResponse>> GetCustomers()
     {
         return await customerService.GetDemoCustomers();
     }
 
-    [HttpPost("[action]")]
+    [HttpPost("")]
     public async Task<IActionResult> Register([FromBody] CreateCustomerModel registerModel)
     {
         if (!ModelState.IsValid)
@@ -35,12 +32,19 @@ public class CustomerController(CustomerService customerService, AzureEmailSende
             if (!result.Succeeded)
                 return BadRequest(new { result.Message, PasswordErrors = result.Content });
 
-            await azureEmailSender.Execute(result);
+            await azureEmailSender.SendConfirmationLinkAsync(result.Content as IdentityUser);
             return Ok(new { result.Message });
         }
         catch (Exception e)
         {
             return BadRequest(new { e.Message });
         }
+    }
+
+    [HttpPost("")]
+    public async Task<IActionResult> Demo(EmailRequestModel emailRequestModel)
+    {
+        await azureEmailSender.TestMethod(emailRequestModel);
+        return Ok();
     }
 }
