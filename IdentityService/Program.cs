@@ -1,16 +1,48 @@
-using Asp.Versioning;
+using System.Text;
 using Azure.Identity;
 using IdentityService.Data;
 using IdentityService.Infrastructure;
 using IdentityService.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Scalar.AspNetCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-builder.Services.AddOpenApi();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition(
+        "Bearer",
+        new OpenApiSecurityScheme
+        {
+            Description = "JWT Authorization header using the Bearer scheme.",
+            Type = SecuritySchemeType.Http,
+            Scheme = "Bearer",
+            BearerFormat = "JWT"
+        }
+    );
+
+    options.AddSecurityRequirement(
+        new OpenApiSecurityRequirement
+        {
+            {
+                new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                    }
+                },
+                []
+            }
+        }
+    );
+});
 builder.Services.Configure<AuthorizationSettings>(
     builder.Configuration.GetSection("AuthorizationSettings")
 );
@@ -31,22 +63,6 @@ builder.Services.AddCors(options =>
                 .AllowCredentials()
     );
 });
-
-builder.Services.AddEndpointsApiExplorer();
-builder
-    .Services.AddApiVersioning(options =>
-    {
-        options.DefaultApiVersion = new ApiVersion(1);
-        options.AssumeDefaultVersionWhenUnspecified = true;
-        options.ReportApiVersions = true;
-        options.ApiVersionReader = new UrlSegmentApiVersionReader();
-    })
-    .AddMvc()
-    .AddApiExplorer(options =>
-    {
-        options.GroupNameFormat = "'v'V";
-        options.SubstituteApiVersionInUrl = true;
-    });
 
 builder.Services.AddDbContext<DataContext>(o =>
     o.UseMySQL(builder.Configuration["IdentityServiceConnectionString"]!)
@@ -83,6 +99,22 @@ builder
     .AddDefaultTokenProviders()
     .AddEntityFrameworkStores<DataContext>();
 
+builder
+    .Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        var key = Encoding.ASCII.GetBytes(builder.Configuration["EmailProviderSecretKey"]!);
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ValidateIssuerSigningKey = true,
+        };
+    });
+
 var app = builder.Build();
 
 // using (var scope = app.Services.CreateScope())
@@ -97,14 +129,8 @@ var app = builder.Build();
 //     await dataInitializer.SeedUserRoles();
 // }
 
-app.MapOpenApi("openapi/v1.json");
-app.MapOpenApi("openapi/v2.json");
-app.MapScalarApiReference(options =>
-{
-    options
-        .WithTheme(ScalarTheme.Mars)
-        .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
-});
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 app.UseRouting();
