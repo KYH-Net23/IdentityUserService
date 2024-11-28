@@ -1,14 +1,13 @@
 ﻿using IdentityService.Models.FormModels;
 using IdentityService.Models.ResponseModels;
 using IdentityService.Services;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IdentityService.Controllers;
 
 [Route("/[controller]/[action]")]
 [ApiController]
-public class CustomerController(CustomerService customerService, AzureEmailSender azureEmailSender)
+public class CustomerController(CustomerService customerService, UserService userService)
     : ControllerBase
 {
     [HttpGet("")]
@@ -32,7 +31,7 @@ public class CustomerController(CustomerService customerService, AzureEmailSende
             if (!result.Succeeded)
                 return BadRequest(new { result.Message, PasswordErrors = result.Content });
 
-            await azureEmailSender.SendConfirmationLinkAsync(result.Content as IdentityUser);
+            // TODO Send request to verification provider here
             return Ok(new { result.Message });
         }
         catch (Exception e)
@@ -41,10 +40,30 @@ public class CustomerController(CustomerService customerService, AzureEmailSende
         }
     }
 
-    [HttpPost("")]
-    public async Task<IActionResult> Demo(EmailRequestModel emailRequestModel)
+    [HttpPut("")]
+    public async Task<IActionResult> ConfirmEmail([FromBody] UpdateEmailRequest model)
     {
-        await azureEmailSender.TestMethod(emailRequestModel);
-        return Ok();
+        // Call on auth provider
+
+        var authorizationResult = "await"; // TODO add token provider call here to auth a token
+
+        if (!ModelState.IsValid)
+        {
+            var errors = ModelState.Values.SelectMany(v => v.Errors);
+            return BadRequest(new { errors });
+        }
+        try
+        {
+            var result = await userService.UpdateEmailConfirmation(model);
+            if (!result.Succeeded)
+                return BadRequest();
+
+            return Ok();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 }

@@ -1,5 +1,6 @@
 using System.Text;
 using Azure.Identity;
+using IdentityService;
 using IdentityService.Data;
 using IdentityService.Infrastructure;
 using IdentityService.Services;
@@ -84,9 +85,16 @@ builder.Services.AddDataProtection();
 builder.Services.AddScoped<CustomerService>();
 builder.Services.AddScoped<AdminService>();
 builder.Services.AddScoped<UserService>();
-builder.Services.AddHttpClient<AzureEmailSender>(client =>
+
+builder.Services.AddHttpClient<VerificationHttpClient>(client =>
 {
-    client.BaseAddress = new Uri("https://rika-solutions-email-provider.azurewebsites.net");
+    client.BaseAddress = new Uri("https://rika-verification-provider.azurewebsites.net/api/");
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
+});
+
+builder.Services.AddHttpClient<AuthorizationHttpClient>(client =>
+{
+    client.BaseAddress = new Uri(""); // TODO token provider here
     client.DefaultRequestHeaders.Add("Accept", "application/json");
 });
 
@@ -95,6 +103,7 @@ builder
     {
         options.Lockout.MaxFailedAccessAttempts = 3;
         options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);
+        options.SignIn.RequireConfirmedEmail = true;
     })
     .AddDefaultTokenProviders()
     .AddEntityFrameworkStores<DataContext>();
@@ -124,9 +133,9 @@ var app = builder.Build();
 //
 //     var dataInitializer = new DataInitializer(roleManager, customerManager);
 //
-//     await dataInitializer.SeedRoles();
+//     // await dataInitializer.SeedRoles();
 //     await dataInitializer.SeedUsers();
-//     await dataInitializer.SeedUserRoles();
+//     // await dataInitializer.SeedUserRoles();
 // }
 
 app.UseSwagger();
