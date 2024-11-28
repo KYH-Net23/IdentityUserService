@@ -1,12 +1,18 @@
+using System;
 using System.Text;
 using Azure.Identity;
 using IdentityService;
 using IdentityService.Data;
 using IdentityService.Infrastructure;
 using IdentityService.Services;
+using IdentityService.Services.HttpClientServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -120,7 +126,7 @@ builder
         options.TokenValidationParameters = new TokenValidationParameters
         {
             IssuerSigningKey = new SymmetricSecurityKey(key),
-            ValidateIssuerSigningKey = true,
+            ValidateIssuerSigningKey = true
         };
     });
 

@@ -11,25 +11,28 @@ public class UserService(
     UserManager<IdentityUser> userManager
 )
 {
-    public async Task<ResponseResult> Login(LoginModel loginModel, bool rememberMe = false)
+    public async Task<ResponseResult> Login(
+        LoginRequestModel loginRequestModel,
+        bool rememberMe = false
+    )
     {
         try
         {
-            var loggedInUser = await userManager.FindByEmailAsync(loginModel.Email);
+            var loggedInUser = await userManager.FindByEmailAsync(loginRequestModel.Email);
 
             if (loggedInUser == null)
             {
                 return new ResponseResult
                 {
                     Succeeded = false,
-                    Message = $"User \"{loginModel.Email}\" not found",
-                    Content = $"User \"{loginModel.Email}\" not found"
+                    Message = $"User \"{loginRequestModel.Email}\" not found",
+                    Content = $"User \"{loginRequestModel.Email}\" not found"
                 };
             }
 
             var tryToSignIn = await signInManager.PasswordSignInAsync(
                 loggedInUser.UserName!,
-                loginModel.Password,
+                loginRequestModel.Password,
                 rememberMe,
                 false
             );
@@ -40,11 +43,11 @@ public class UserService(
                 {
                     Succeeded = false,
                     Message =
-                        $"Your email (\"{loginModel.Email}\") is not confirmed. Please check your email for instructions.",
+                        $"Your email (\"{loginRequestModel.Email}\") is not confirmed. Please check your email for instructions.",
                     Content = new EmailRequestModel
                     {
-                        EmailAddress = loginModel.Email,
-                        UserId = loginModel.Email // TODO change to ID later
+                        EmailAddress = loginRequestModel.Email,
+                        UserId = loginRequestModel.Email // TODO change to ID later
                     }
                 };
             }
@@ -71,7 +74,7 @@ public class UserService(
             }
 
             var userRole = await userManager.GetRolesAsync(loggedInUser);
-            if (loggedInUser is Customer customer)
+            if (loggedInUser is CustomerEntity customer)
             {
                 customer.LastActiveDate = DateTime.Now;
                 await userManager.UpdateAsync(customer);
@@ -99,7 +102,7 @@ public class UserService(
                 Content = new
                 {
                     Role = userRole,
-                    loginModel.Email,
+                    loginRequestModel.Email,
                     loggedInUser.Id
                 }
             };

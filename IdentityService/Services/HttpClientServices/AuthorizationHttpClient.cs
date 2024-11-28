@@ -1,4 +1,4 @@
-﻿namespace IdentityService;
+﻿namespace IdentityService.Services.HttpClientServices;
 
 public class AuthorizationHttpClient
 {

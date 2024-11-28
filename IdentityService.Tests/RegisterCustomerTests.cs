@@ -9,7 +9,7 @@ public class RegisterCustomerTests(UserManagerFixture fixture) : IClassFixture<U
     [Fact]
     public async Task RegisterCustomer_Success()
     {
-        var userModel = new CreateCustomerModel
+        var userModel = new CreateCustomerRequestModel
         {
             Username = "TestUser",
             Email = "TestUser@gmail.com",
@@ -35,7 +35,7 @@ public class RegisterCustomerTests(UserManagerFixture fixture) : IClassFixture<U
     [Fact]
     public async Task RegisterCustomer_Failure()
     {
-        var userModel = new CreateCustomerModel
+        var userModel = new CreateCustomerRequestModel
         {
             Username = "TestUser",
             Email = "TestUser@gmail.com",

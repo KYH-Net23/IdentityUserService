@@ -4,7 +4,7 @@ using IdentityService.Infrastructure;
 
 namespace IdentityService.Models.FormModels;
 
-public class CreateCustomerModel
+public class CreateCustomerRequestModel
 {
     [Required]
     [StringLength(

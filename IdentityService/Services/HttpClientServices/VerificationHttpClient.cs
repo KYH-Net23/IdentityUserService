@@ -1,6 +1,6 @@
 ﻿using IdentityService.Models.FormModels;
 
-namespace IdentityService;
+namespace IdentityService.Services.HttpClientServices;
 
 public class VerificationHttpClient
 {

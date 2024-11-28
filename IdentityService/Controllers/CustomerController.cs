@@ -17,7 +17,9 @@ public class CustomerController(CustomerService customerService, UserService use
     }
 
     [HttpPost("")]
-    public async Task<IActionResult> Register([FromBody] CreateCustomerModel registerModel)
+    public async Task<IActionResult> Register(
+        [FromBody] CreateCustomerRequestModel registerRequestModel
+    )
     {
         if (!ModelState.IsValid)
         {
@@ -26,7 +28,7 @@ public class CustomerController(CustomerService customerService, UserService use
         }
         try
         {
-            var result = await customerService.RegisterCustomer(registerModel);
+            var result = await customerService.RegisterCustomer(registerRequestModel);
 
             if (!result.Succeeded)
                 return BadRequest(new { result.Message, PasswordErrors = result.Content });

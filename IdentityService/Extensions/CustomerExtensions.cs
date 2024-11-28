@@ -5,9 +5,9 @@ namespace IdentityService.Extensions;
 
 public static class CustomerExtensions
 {
-    public static Customer MapToCustomer(this CreateCustomerModel source)
+    public static CustomerEntity MapToCustomer(this CreateCustomerRequestModel source)
     {
-        return new Customer
+        return new CustomerEntity
         {
             UserName = source.Username,
             NormalizedUserName = source.Username.ToUpper(),

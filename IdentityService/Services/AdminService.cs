@@ -15,7 +15,7 @@ public class AdminService(
     {
         var listOfAdmins = await userManager.GetUsersInRoleAsync(UserRoles.Admin.ToString());
 
-        var adminList = listOfAdmins.OfType<Admin>().ToList();
+        var adminList = listOfAdmins.OfType<AdminEntity>().ToList();
 
         return AdminRequestResponseFactory.Create(adminList);
     }

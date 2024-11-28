@@ -14,25 +14,27 @@ public class CustomerService(UserManager<IdentityUser> userManager)
     {
         var listOfCustomers = await userManager.GetUsersInRoleAsync(UserRoles.Customer.ToString());
 
-        var customerList = listOfCustomers.OfType<Customer>().ToList();
+        var customerList = listOfCustomers.OfType<CustomerEntity>().ToList();
 
         return CustomerRequestResponseFactory.Create(customerList);
     }
 
-    public async Task<ResponseResult> RegisterCustomer(CreateCustomerModel registerModel)
+    public async Task<ResponseResult> RegisterCustomer(
+        CreateCustomerRequestModel registerRequestModel
+    )
     {
         try
         {
-            var existingUserName = await userManager.FindByNameAsync(registerModel.Username);
-            var existingEmail = await userManager.FindByEmailAsync(registerModel.Email);
+            var existingUserName = await userManager.FindByNameAsync(registerRequestModel.Username);
+            var existingEmail = await userManager.FindByEmailAsync(registerRequestModel.Email);
 
             if (existingUserName != null || existingEmail != null)
             {
                 return new ResponseResult { Succeeded = false, Message = "User already exists" };
             }
 
-            var newCustomer = registerModel.MapToCustomer();
-            var result = await userManager.CreateAsync(newCustomer, registerModel.Password);
+            var newCustomer = registerRequestModel.MapToCustomer();
+            var result = await userManager.CreateAsync(newCustomer, registerRequestModel.Password);
 
             if (!result.Succeeded)
             {
@@ -50,7 +52,7 @@ public class CustomerService(UserManager<IdentityUser> userManager)
             {
                 Succeeded = true,
                 Message = "User created",
-                Content = userManager.FindByEmailAsync(registerModel.Email)
+                Content = userManager.FindByEmailAsync(registerRequestModel.Email)
             };
         }
         catch (Exception e)
