@@ -31,4 +31,5 @@ public class CustomerEntity : IdentityUser
     public DateTime AccountCreationDate { get; set; } = DateTime.Now;
     public DateTime LastActiveDate { get; set; }
     public bool IsDeleted { get; set; }
+    public bool? HasRequestedPasswordReset { get; set; }
 }
