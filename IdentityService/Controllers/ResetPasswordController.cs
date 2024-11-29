@@ -48,10 +48,10 @@ namespace IdentityService.Controllers
             try
             {
                 var result = await _userService.ResetPassword(model.ResetGuid);
-                if (result)
+                if (result.Succeeded)
                     return Ok();
 
-                return BadRequest();
+                return BadRequest(new { message = result.Message });
             }
             catch (Exception ex)
             {
@@ -68,9 +68,7 @@ namespace IdentityService.Controllers
             {
                 var result = await _userService.ChangePassword(requestModel);
                 if (result.Succeeded)
-                {
                     return Ok();
-                }
 
                 return BadRequest(result.Errors);
             }

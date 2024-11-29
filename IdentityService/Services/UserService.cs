@@ -198,33 +198,48 @@ public class UserService(
                     Receiver = email,
                     ResetGuid = customer.PasswordResetGuid
                 };
-            case AdminEntity admin:
-                admin.PasswordResetGuid = Guid.NewGuid().ToString();
-                await userManager.UpdateAsync(admin);
-                return new ResetPasswordModel
-                {
-                    Receiver = email,
-                    ResetGuid = admin.PasswordResetGuid
-                };
+            case AdminEntity:
+                return null;
             default:
                 return null!;
         }
     }
 
-    public async Task<bool> ResetPassword(string guid)
+    public async Task<ResponseResult> ResetPassword(string guid)
     {
-        var user = await userManager
-            .Users.Cast<CustomerEntity>()
-            .FirstOrDefaultAsync(x => x.PasswordResetGuid == guid);
+        try
+        {
+            var user = await userManager
+                .Users.Cast<CustomerEntity>()
+                .FirstOrDefaultAsync(x => x.PasswordResetGuid == guid);
 
-        if (user == null)
-            return false;
+            if (user == null)
+                return new ResponseResult { Succeeded = false, Message = "User does not exist." };
 
-        await userManager.SetLockoutEndDateAsync(user, DateTime.Now.AddHours(2));
-        user.HasRequestedPasswordReset = true;
-        await userManager.UpdateAsync(user);
+            await userManager.SetLockoutEndDateAsync(user, DateTime.Now.AddHours(2));
+            user.HasRequestedPasswordReset = true;
+            await userManager.UpdateAsync(user);
 
-        return true;
+            return new ResponseResult { Succeeded = true };
+        }
+        catch (InvalidCastException e)
+        {
+            return new ResponseResult
+            {
+                Succeeded = false,
+                Message = "Admins can not reset their passwords.",
+                Content = e.Message
+            };
+        }
+        catch (Exception e)
+        {
+            return new ResponseResult
+            {
+                Succeeded = false,
+                Message = null,
+                Content = e.Message
+            };
+        }
     }
 
     public async Task<IdentityResult> ChangePassword(ChangePasswordRequestModel requestModel)
@@ -233,10 +248,7 @@ public class UserService(
         {
             var user = await userManager.FindByEmailAsync(requestModel.Email);
 
-            if (user is not CustomerEntity customer)
-                return IdentityResult.Failed();
-
-            if (customer.HasRequestedPasswordReset == null)
+            if (user is not CustomerEntity customer || customer.HasRequestedPasswordReset is null)
                 return IdentityResult.Failed();
 
             await userManager.RemovePasswordAsync(user);
