@@ -7,13 +7,21 @@ namespace IdentityService.Controllers;
 
 [Route("/[controller]/[action]")]
 [ApiController]
-public class CustomerController(CustomerService customerService, UserService userService)
-    : ControllerBase
+public class CustomerController : ControllerBase
 {
+    private readonly CustomerService _customerService;
+    private readonly UserService _userService;
+
+    public CustomerController(CustomerService customerService, UserService userService)
+    {
+        _customerService = customerService;
+        _userService = userService;
+    }
+
     [HttpGet("")]
     public async Task<IEnumerable<CustomerRequestResponse>> GetCustomers()
     {
-        return await customerService.GetDemoCustomers();
+        return await _customerService.GetDemoCustomers();
     }
 
     [HttpPost("")]
@@ -28,7 +36,7 @@ public class CustomerController(CustomerService customerService, UserService use
         }
         try
         {
-            var result = await customerService.RegisterCustomer(registerRequestModel);
+            var result = await _customerService.RegisterCustomer(registerRequestModel);
 
             if (!result.Succeeded)
                 return BadRequest(new { result.Message, PasswordErrors = result.Content });
@@ -58,7 +66,7 @@ public class CustomerController(CustomerService customerService, UserService use
         }
         try
         {
-            var result = await userService.UpdateEmailConfirmation(model);
+            var result = await _userService.UpdateEmailConfirmation(model);
             if (!result.Succeeded)
                 return BadRequest();
 

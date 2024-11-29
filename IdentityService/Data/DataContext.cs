@@ -4,8 +4,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IdentityService.Data;
 
-public class DataContext(DbContextOptions<DataContext> options) : IdentityDbContext(options)
+public class DataContext : IdentityDbContext
 {
+    public DataContext(DbContextOptions<DataContext> options)
+        : base(options) { }
+
     public DbSet<CustomerEntity> Customers { get; set; }
     public DbSet<AdminEntity> Admins { get; set; }
 

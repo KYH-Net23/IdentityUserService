@@ -8,11 +8,18 @@ using Microsoft.AspNetCore.Identity;
 
 namespace IdentityService.Services;
 
-public class CustomerService(UserManager<IdentityUser> userManager)
+public class CustomerService
 {
+    private readonly UserManager<IdentityUser> _userManager;
+
+    public CustomerService(UserManager<IdentityUser> userManager)
+    {
+        _userManager = userManager;
+    }
+
     public async Task<List<CustomerRequestResponse>> GetDemoCustomers()
     {
-        var listOfCustomers = await userManager.GetUsersInRoleAsync(UserRoles.Customer.ToString());
+        var listOfCustomers = await _userManager.GetUsersInRoleAsync(UserRoles.Customer.ToString());
 
         var customerList = listOfCustomers.OfType<CustomerEntity>().ToList();
 
@@ -25,8 +32,10 @@ public class CustomerService(UserManager<IdentityUser> userManager)
     {
         try
         {
-            var existingUserName = await userManager.FindByNameAsync(registerRequestModel.Username);
-            var existingEmail = await userManager.FindByEmailAsync(registerRequestModel.Email);
+            var existingUserName = await _userManager.FindByNameAsync(
+                registerRequestModel.Username
+            );
+            var existingEmail = await _userManager.FindByEmailAsync(registerRequestModel.Email);
 
             if (existingUserName != null || existingEmail != null)
             {
@@ -34,7 +43,7 @@ public class CustomerService(UserManager<IdentityUser> userManager)
             }
 
             var newCustomer = registerRequestModel.MapToCustomer();
-            var result = await userManager.CreateAsync(newCustomer, registerRequestModel.Password);
+            var result = await _userManager.CreateAsync(newCustomer, registerRequestModel.Password);
 
             if (!result.Succeeded)
             {
@@ -46,13 +55,13 @@ public class CustomerService(UserManager<IdentityUser> userManager)
                     Content = errors
                 };
             }
-            await userManager.AddToRoleAsync(newCustomer, UserRoles.Customer.ToString());
+            await _userManager.AddToRoleAsync(newCustomer, UserRoles.Customer.ToString());
 
             return new ResponseResult
             {
                 Succeeded = true,
                 Message = "User created",
-                Content = userManager.FindByEmailAsync(registerRequestModel.Email)
+                Content = _userManager.FindByEmailAsync(registerRequestModel.Email)
             };
         }
         catch (Exception e)

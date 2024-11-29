@@ -6,11 +6,21 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IdentityService.Services;
 
-public class UserService(
-    SignInManager<IdentityUser> signInManager,
-    UserManager<IdentityUser> userManager
-)
+public class UserService
 {
+    private readonly SignInManager<IdentityUser> _signInManager;
+    private readonly UserManager<IdentityUser> _userManager;
+    private const int LockOutDurationInHours = 2;
+
+    public UserService(
+        SignInManager<IdentityUser> signInManager,
+        UserManager<IdentityUser> userManager
+    )
+    {
+        _signInManager = signInManager;
+        _userManager = userManager;
+    }
+
     public async Task<ResponseResult> Login(
         LoginRequestModel loginRequestModel,
         bool rememberMe = false
@@ -18,7 +28,7 @@ public class UserService(
     {
         try
         {
-            var loggedInUser = await userManager.FindByEmailAsync(loginRequestModel.Email);
+            var loggedInUser = await _userManager.FindByEmailAsync(loginRequestModel.Email);
 
             if (loggedInUser == null)
             {
@@ -30,7 +40,7 @@ public class UserService(
                 };
             }
 
-            var tryToSignIn = await signInManager.PasswordSignInAsync(
+            var tryToSignIn = await _signInManager.PasswordSignInAsync(
                 loggedInUser.UserName!,
                 loginRequestModel.Password,
                 rememberMe,
@@ -54,8 +64,8 @@ public class UserService(
 
             if (!tryToSignIn.Succeeded)
             {
-                await userManager.AccessFailedAsync(loggedInUser);
-                if (!await userManager.IsLockedOutAsync(loggedInUser))
+                await _userManager.AccessFailedAsync(loggedInUser);
+                if (!await _userManager.IsLockedOutAsync(loggedInUser))
                     return new ResponseResult
                     {
                         Succeeded = false,
@@ -63,7 +73,7 @@ public class UserService(
                         Content = "Invalid login attempt"
                     };
 
-                var lockoutEndDate = await userManager.GetLockoutEndDateAsync(loggedInUser);
+                var lockoutEndDate = await _userManager.GetLockoutEndDateAsync(loggedInUser);
 
                 if (loggedInUser is not CustomerEntity customerEntity)
                     return new ResponseResult
@@ -100,7 +110,7 @@ public class UserService(
                 };
             }
 
-            var userRole = await userManager.GetRolesAsync(loggedInUser);
+            var userRole = await _userManager.GetRolesAsync(loggedInUser);
 
             if (loggedInUser is not CustomerEntity customer)
                 return new ResponseResult
@@ -116,7 +126,7 @@ public class UserService(
                 };
 
             customer.LastActiveDate = DateTime.Now;
-            await userManager.UpdateAsync(customer);
+            await _userManager.UpdateAsync(customer);
 
             return new ResponseResult
             {
@@ -152,7 +162,7 @@ public class UserService(
         // Verification provider calls on this
         try
         {
-            var user = await userManager.FindByEmailAsync(model.Email);
+            var user = await _userManager.FindByEmailAsync(model.Email);
             if (user is null)
             {
                 return new ResponseResult
@@ -164,7 +174,7 @@ public class UserService(
             }
 
             user.EmailConfirmed = true;
-            await userManager.UpdateAsync(user);
+            await _userManager.UpdateAsync(user);
             return new ResponseResult
             {
                 Succeeded = true,
@@ -185,14 +195,14 @@ public class UserService(
 
     public async Task<ResetPasswordModel?> FindUserByEmailAsync(string email)
     {
-        var user = await userManager.FindByEmailAsync(email);
+        var user = await _userManager.FindByEmailAsync(email);
         switch (user)
         {
             case null:
                 return null;
             case CustomerEntity customer:
                 customer.PasswordResetGuid = Guid.NewGuid().ToString();
-                await userManager.UpdateAsync(customer);
+                await _userManager.UpdateAsync(customer);
                 return new ResetPasswordModel
                 {
                     Receiver = email,
@@ -209,16 +219,19 @@ public class UserService(
     {
         try
         {
-            var user = await userManager
+            var user = await _userManager
                 .Users.Cast<CustomerEntity>()
                 .FirstOrDefaultAsync(x => x.PasswordResetGuid == guid);
 
             if (user == null)
                 return new ResponseResult { Succeeded = false, Message = "User does not exist." };
 
-            await userManager.SetLockoutEndDateAsync(user, DateTime.Now.AddHours(2));
+            await _userManager.SetLockoutEndDateAsync(
+                user,
+                DateTime.Now.AddHours(LockOutDurationInHours)
+            );
             user.HasRequestedPasswordReset = true;
-            await userManager.UpdateAsync(user);
+            await _userManager.UpdateAsync(user);
 
             return new ResponseResult { Succeeded = true };
         }
@@ -246,13 +259,13 @@ public class UserService(
     {
         try
         {
-            var user = await userManager.FindByEmailAsync(requestModel.Email);
+            var user = await _userManager.FindByEmailAsync(requestModel.Email);
 
             if (user is not CustomerEntity customer || customer.HasRequestedPasswordReset is null)
                 return IdentityResult.Failed();
 
-            await userManager.RemovePasswordAsync(user);
-            var result = await userManager.AddPasswordAsync(user, requestModel.NewPassword);
+            await _userManager.RemovePasswordAsync(user);
+            var result = await _userManager.AddPasswordAsync(user, requestModel.NewPassword);
 
             if (!result.Succeeded)
                 return result;
@@ -260,7 +273,7 @@ public class UserService(
             user.LockoutEnd = null;
             customer.HasRequestedPasswordReset = null;
             customer.PasswordResetGuid = null;
-            await userManager.UpdateAsync(customer);
+            await _userManager.UpdateAsync(customer);
 
             return result;
         }

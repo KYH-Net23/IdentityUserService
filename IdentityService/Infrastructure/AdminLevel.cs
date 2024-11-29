@@ -1,9 +1,8 @@
-﻿namespace IdentityService.Infrastructure
+﻿namespace IdentityService.Infrastructure;
+
+public enum AdminLevel
 {
-	public enum AdminLevel
-	{
-		SuperAdmin,
-		Admin,
-		Moderator
-	}
+    SuperAdmin,
+    Admin,
+    Moderator
 }

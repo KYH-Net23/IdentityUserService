@@ -1,9 +1,8 @@
-﻿namespace IdentityService.Infrastructure
+﻿namespace IdentityService.Infrastructure;
+
+public enum UserRoles
 {
-	public enum UserRoles
-	{
-		Admin,
-		Customer,
-		Debug
-	}
+    Admin,
+    Customer,
+    Debug
 }

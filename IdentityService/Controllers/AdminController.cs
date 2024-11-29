@@ -9,13 +9,21 @@ namespace IdentityService.Controllers;
 [ApiVersion("2.0")]
 [ApiController]
 [Route("[controller]")]
-public class AdminController(UserManager<IdentityUser> userManager, AdminService adminService)
-    : ControllerBase
+public class AdminController : ControllerBase
 {
+    private readonly UserManager<IdentityUser> _userManager;
+    private readonly AdminService _adminService;
+
+    public AdminController(UserManager<IdentityUser> userManager, AdminService adminService)
+    {
+        _userManager = userManager;
+        _adminService = adminService;
+    }
+
     [HttpGet("{email}")]
     public async Task<IActionResult> GetUser(string email)
     {
-        var user = await userManager.FindByEmailAsync(email);
+        var user = await _userManager.FindByEmailAsync(email);
         if (user != null)
         {
             return Ok(user.Email + user.UserName);
@@ -27,7 +35,7 @@ public class AdminController(UserManager<IdentityUser> userManager, AdminService
     [HttpGet("GetAdmins")]
     public async Task<IActionResult> GetAdmins()
     {
-        var listOfAdmins = await adminService.GetAdmins();
+        var listOfAdmins = await _adminService.GetAdmins();
         return Ok(listOfAdmins);
     }
 
