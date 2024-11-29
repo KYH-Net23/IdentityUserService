@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using IdentityService.Models.RequestModels;
+using Newtonsoft.Json;
 
 public partial class EmailProviderHttpClient
 {

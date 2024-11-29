@@ -2,7 +2,7 @@
 using IdentityService.Factories;
 using IdentityService.Infrastructure;
 using IdentityService.Models.DataModels;
-using IdentityService.Models.FormModels;
+using IdentityService.Models.RequestModels;
 using IdentityService.Models.ResponseModels;
 using Microsoft.AspNetCore.Identity;
 

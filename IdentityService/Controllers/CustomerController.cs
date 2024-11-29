@@ -1,4 +1,4 @@
-﻿using IdentityService.Models.FormModels;
+﻿using IdentityService.Models.RequestModels;
 using IdentityService.Models.ResponseModels;
 using IdentityService.Services;
 using Microsoft.AspNetCore.Mvc;

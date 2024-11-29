@@ -1,4 +1,7 @@
-﻿namespace IdentityService.Services.HttpClientServices;
+﻿using System.Text.Json;
+using IdentityService.Models.RequestModels;
+
+namespace IdentityService.Services.HttpClientServices;
 
 public class AuthorizationHttpClient
 {
@@ -9,8 +12,9 @@ public class AuthorizationHttpClient
         _httpClient = httpClient;
     }
 
-    public async Task<HttpResponseMessage> PostAsync(string url)
+    public async Task<HttpResponseMessage> PostAsync(string url, UpdateEmailRequest model)
     {
-        return await _httpClient.PostAsync(url, null);
+        var body = JsonSerializer.Serialize(model);
+        return await _httpClient.PostAsJsonAsync(url, body); // TODO
     }
 }

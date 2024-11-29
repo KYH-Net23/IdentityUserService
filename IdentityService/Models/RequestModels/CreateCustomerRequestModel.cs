@@ -2,7 +2,7 @@
 using System.Text.Json.Serialization;
 using IdentityService.Infrastructure;
 
-namespace IdentityService.Models.FormModels;
+namespace IdentityService.Models.RequestModels;
 
 public class CreateCustomerRequestModel
 {

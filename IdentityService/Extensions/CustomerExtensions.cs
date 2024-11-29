@@ -1,5 +1,5 @@
 ﻿using IdentityService.Models.DataModels;
-using IdentityService.Models.FormModels;
+using IdentityService.Models.RequestModels;
 
 namespace IdentityService.Extensions;
 

@@ -1,4 +1,4 @@
-﻿using IdentityService.Models.FormModels;
+﻿using IdentityService.Models.RequestModels;
 using Microsoft.AspNetCore.Identity;
 using Moq;
 

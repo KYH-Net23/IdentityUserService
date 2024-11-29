@@ -1,5 +1,5 @@
 ﻿using IdentityService.Models;
-using IdentityService.Models.FormModels;
+using IdentityService.Models.RequestModels;
 using IdentityService.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;

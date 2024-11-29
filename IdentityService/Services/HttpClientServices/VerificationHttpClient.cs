@@ -1,4 +1,4 @@
-﻿using IdentityService.Models.FormModels;
+﻿using IdentityService.Models.RequestModels;
 
 namespace IdentityService.Services.HttpClientServices;
 

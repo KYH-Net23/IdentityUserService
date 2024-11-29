@@ -76,16 +76,16 @@ builder.Services.AddDbContext<DataContext>(o =>
     o.UseMySQL(builder.Configuration["IdentityServiceConnectionString"]!)
 );
 
-//var vaultUri = new Uri($"{builder.Configuration["KeyVault"]!}");
+var vaultUri = new Uri($"{builder.Configuration["KeyVault"]!}");
 
-//if (builder.Environment.IsDevelopment())
-//{
-//    builder.Configuration.AddAzureKeyVault(vaultUri, new VisualStudioCredential());
-//}
-//else
-//{
-//    builder.Configuration.AddAzureKeyVault(vaultUri, new DefaultAzureCredential());
-//}
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddAzureKeyVault(vaultUri, new VisualStudioCredential());
+}
+else
+{
+    builder.Configuration.AddAzureKeyVault(vaultUri, new DefaultAzureCredential());
+}
 
 builder.Services.AddDataProtection();
 

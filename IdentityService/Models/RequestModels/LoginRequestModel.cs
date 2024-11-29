@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace IdentityService.Models.FormModels;
+namespace IdentityService.Models.RequestModels;
 
 public class LoginRequestModel
 {
