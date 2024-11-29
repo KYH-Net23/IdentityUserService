@@ -34,7 +34,6 @@ namespace IdentityService.Controllers
                 else
                     await _emailProviderHttpClient.PostAsync("/reset", result);
                     
-
                 return Ok();
 
             }
@@ -72,6 +71,7 @@ namespace IdentityService.Controllers
                 var result = await _userService.ChangePassword(model);
                 if (result.Succeeded)
                 {
+               
                     return Ok();
                 }
                 else

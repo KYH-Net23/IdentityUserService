@@ -67,6 +67,17 @@ public class UserService(
                         Content = "Invalid login attempt"
                     };
                 var lockoutEndDate = await userManager.GetLockoutEndDateAsync(loggedInUser);
+                if (loggedInUser is CustomerEntity cust)
+                {
+                   if((bool)cust.HasRequestedPasswordReset)
+                    {
+                        return new ResponseResult{
+                            Succeeded = false,
+                            Message = "You have requested a password reset. Please reset your password before trying to log in.",
+                            Content = "You have requested a password reset. Please reset your password before trying to log in."
+                        };
+                    }
+                }
                 return new ResponseResult
                 {
                     Succeeded = false,
@@ -222,6 +233,7 @@ public class UserService(
                     {
                         user!.LockoutEnd = null;
                         customer.HasRequestedPasswordReset = null;
+                        customer.PasswordResetGuid = null;
                         await userManager.UpdateAsync(customer);
                     }
                     return result;
