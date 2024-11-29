@@ -1,14 +1,18 @@
 ﻿using IdentityService.Controllers;
+using IdentityService.Data;
 using IdentityService.Models.DataModels;
 using IdentityService.Models.FormModels;
+using IdentityService.Models.RequestModels;
 using IdentityService.Models.ResponseModels;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace IdentityService.Services;
 
 public class UserService(
     SignInManager<IdentityUser> signInManager,
-    UserManager<IdentityUser> userManager
+    UserManager<IdentityUser> userManager,
+    DataContext dbContext
 )
 {
     public async Task<ResponseResult> Login(
@@ -152,4 +156,83 @@ public class UserService(
             Content = null
         };
     }
+
+    public async Task<ResetPasswordModel?> FindUserByEmailAsync(string email)
+    {
+        var user = await userManager.FindByEmailAsync(email);
+        if (user is null)
+        {
+            return null;
+        }
+        if (user is CustomerEntity customer)
+        {
+            customer.PasswordResetGuid = Guid.NewGuid().ToString();
+            await userManager.UpdateAsync(customer);
+            return new ResetPasswordModel
+            {
+                Receiver = email,
+                ResetGuid = customer.PasswordResetGuid
+            };
+        }
+        else if (user is AdminEntity admin)
+        {
+            admin.PasswordResetGuid = Guid.NewGuid().ToString();
+            await userManager.UpdateAsync(admin);
+            return new ResetPasswordModel
+            {
+                Receiver = email,
+                ResetGuid = admin.PasswordResetGuid
+            };
+        }
+
+        return null!;
+    }
+
+
+    public async Task<bool> ResetPassword(string guid)
+    {
+        var user = await dbContext.Customers.FirstOrDefaultAsync(x => x.PasswordResetGuid == guid);
+
+        if (user != null)
+        {
+            await userManager.SetLockoutEndDateAsync(user!, DateTime.Now.AddHours(2));
+            user.HasRequestedPasswordReset = true;
+            await userManager.UpdateAsync(user);
+            return true;
+        }
+        return false;
+    }
+
+    public async Task<IdentityResult> ChangePassword(ChangePasswordModel model)
+    {
+        try
+        {
+            var user = await userManager.FindByEmailAsync(model.Email);
+            if (user != null && user is CustomerEntity customer)
+            {
+                if(customer.HasRequestedPasswordReset == null)
+                {
+                    return IdentityResult.Failed();
+                }
+                else
+                {
+                    await userManager.RemovePasswordAsync(user!);
+                    var result = await userManager.AddPasswordAsync(user!, model.NewPassword);
+                    if (result.Succeeded)
+                    {
+                        user!.LockoutEnd = null;
+                        customer.HasRequestedPasswordReset = null;
+                        await userManager.UpdateAsync(customer);
+                    }
+                    return result;
+                }
+            }
+            return IdentityResult.Failed();
+        }
+        catch
+        {
+            return IdentityResult.Failed();
+        }
+    }
+
 }

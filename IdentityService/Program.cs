@@ -4,6 +4,7 @@ using Azure.Identity;
 using IdentityService;
 using IdentityService.Data;
 using IdentityService.Infrastructure;
+using IdentityService.Models.DataModels;
 using IdentityService.Services;
 using IdentityService.Services.HttpClientServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -75,16 +76,16 @@ builder.Services.AddDbContext<DataContext>(o =>
     o.UseMySQL(builder.Configuration["IdentityServiceConnectionString"]!)
 );
 
-var vaultUri = new Uri($"{builder.Configuration["KeyVault"]!}");
+//var vaultUri = new Uri($"{builder.Configuration["KeyVault"]!}");
 
-if (builder.Environment.IsDevelopment())
-{
-    builder.Configuration.AddAzureKeyVault(vaultUri, new VisualStudioCredential());
-}
-else
-{
-    builder.Configuration.AddAzureKeyVault(vaultUri, new DefaultAzureCredential());
-}
+//if (builder.Environment.IsDevelopment())
+//{
+//    builder.Configuration.AddAzureKeyVault(vaultUri, new VisualStudioCredential());
+//}
+//else
+//{
+//    builder.Configuration.AddAzureKeyVault(vaultUri, new DefaultAzureCredential());
+//}
 
 builder.Services.AddDataProtection();
 
@@ -104,6 +105,12 @@ builder.Services.AddHttpClient<AuthorizationHttpClient>(client =>
     client.DefaultRequestHeaders.Add("Accept", "application/json");
 });
 
+builder.Services.AddHttpClient<EmailProviderHttpClient>(client =>
+{
+    client.BaseAddress = new Uri("https://rika-solutions-email-provider.azurewebsites.net");
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
+});
+
 builder
     .Services.AddIdentity<IdentityUser, IdentityRole>(options =>
     {
@@ -114,21 +121,21 @@ builder
     .AddDefaultTokenProviders()
     .AddEntityFrameworkStores<DataContext>();
 
-builder
-    .Services.AddAuthentication(options =>
-    {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer(options =>
-    {
-        var key = Encoding.ASCII.GetBytes(builder.Configuration["EmailProviderSecretKey"]!);
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            IssuerSigningKey = new SymmetricSecurityKey(key),
-            ValidateIssuerSigningKey = true
-        };
-    });
+//builder
+//    .Services.AddAuthentication(options =>
+//    {
+//        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+//        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+//    })
+//    .AddJwtBearer(options =>
+//    {
+//        var key = Encoding.ASCII.GetBytes(builder.Configuration["EmailProviderSecretKey"]!);
+//        options.TokenValidationParameters = new TokenValidationParameters
+//        {
+//            IssuerSigningKey = new SymmetricSecurityKey(key),
+//            ValidateIssuerSigningKey = true
+//        };
+//    });
 
 var app = builder.Build();
 
@@ -152,7 +159,7 @@ app.UseRouting();
 
 app.UseCors("AllowSpecificOrigin");
 
-app.UseAuthentication();
+//app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
