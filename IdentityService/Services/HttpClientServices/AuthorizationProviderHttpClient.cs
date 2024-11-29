@@ -3,16 +3,19 @@ using IdentityService.Models.RequestModels;
 
 namespace IdentityService.Services.HttpClientServices;
 
-public class AuthorizationHttpClient
+public class AuthorizationProviderHttpClient
 {
     private readonly HttpClient _httpClient;
 
-    public AuthorizationHttpClient(HttpClient httpClient)
+    public AuthorizationProviderHttpClient(HttpClient httpClient)
     {
         _httpClient = httpClient;
     }
 
-    public async Task<HttpResponseMessage> PostAsync(string url, UpdateEmailRequest model)
+    public async Task<HttpResponseMessage> PostAsync(
+        string url,
+        AuthorizationForEmailProviderRequestModel model
+    )
     {
         var body = JsonSerializer.Serialize(model);
         return await _httpClient.PostAsJsonAsync(url, body); // TODO

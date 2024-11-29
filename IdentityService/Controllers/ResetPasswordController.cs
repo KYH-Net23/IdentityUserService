@@ -1,5 +1,6 @@
 ﻿using IdentityService.Models.RequestModels;
 using IdentityService.Services;
+using IdentityService.Services.HttpClientServices;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IdentityService.Controllers
@@ -63,11 +64,13 @@ namespace IdentityService.Controllers
         }
 
         [HttpPost("/changepassword")]
-        public async Task<IActionResult> ChangePasswordRequest([FromBody] ChangePasswordModel model)
+        public async Task<IActionResult> ChangePasswordRequest(
+            [FromBody] ChangePasswordRequestModel requestModel
+        )
         {
             try
             {
-                var result = await _userService.ChangePassword(model);
+                var result = await _userService.ChangePassword(requestModel);
                 if (result.Succeeded)
                 {
                     return Ok();

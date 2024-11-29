@@ -1,7 +1,8 @@
 ﻿using IdentityService.Models.RequestModels;
-using Newtonsoft.Json;
 
-public partial class EmailProviderHttpClient
+namespace IdentityService.Services.HttpClientServices;
+
+public class EmailProviderHttpClient
 {
     private readonly HttpClient _httpClient;
 

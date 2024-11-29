@@ -144,7 +144,9 @@ public class UserService(
         }
     }
 
-    public async Task<ResponseResult> UpdateEmailConfirmation(UpdateEmailRequest model)
+    public async Task<ResponseResult> UpdateEmailConfirmation(
+        AuthorizationForEmailProviderRequestModel model
+    )
     {
         // Verification provider calls on this
         try
@@ -224,11 +226,11 @@ public class UserService(
         return true;
     }
 
-    public async Task<IdentityResult> ChangePassword(ChangePasswordModel model)
+    public async Task<IdentityResult> ChangePassword(ChangePasswordRequestModel requestModel)
     {
         try
         {
-            var user = await userManager.FindByEmailAsync(model.Email);
+            var user = await userManager.FindByEmailAsync(requestModel.Email);
 
             if (user is not CustomerEntity customer)
                 return IdentityResult.Failed();
@@ -237,7 +239,7 @@ public class UserService(
                 return IdentityResult.Failed();
 
             await userManager.RemovePasswordAsync(user);
-            var result = await userManager.AddPasswordAsync(user, model.NewPassword);
+            var result = await userManager.AddPasswordAsync(user, requestModel.NewPassword);
 
             if (!result.Succeeded)
                 return result;

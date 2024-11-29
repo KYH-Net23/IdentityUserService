@@ -1,56 +1,16 @@
-using System;
-using System.Text;
 using Azure.Identity;
-using IdentityService;
 using IdentityService.Data;
 using IdentityService.Infrastructure;
-using IdentityService.Models.DataModels;
 using IdentityService.Services;
 using IdentityService.Services.HttpClientServices;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
-{
-    options.AddSecurityDefinition(
-        "Bearer",
-        new OpenApiSecurityScheme
-        {
-            Description = "JWT Authorization header using the Bearer scheme.",
-            Type = SecuritySchemeType.Http,
-            Scheme = "Bearer",
-            BearerFormat = "JWT"
-        }
-    );
-
-    options.AddSecurityRequirement(
-        new OpenApiSecurityRequirement
-        {
-            {
-                new OpenApiSecurityScheme
-                {
-                    Reference = new OpenApiReference
-                    {
-                        Type = ReferenceType.SecurityScheme,
-                        Id = "Bearer"
-                    }
-                },
-                []
-            }
-        }
-    );
-});
+builder.Services.AddSwaggerGen();
 builder.Services.Configure<AuthorizationSettings>(
     builder.Configuration.GetSection("AuthorizationSettings")
 );
@@ -99,7 +59,7 @@ builder.Services.AddHttpClient<VerificationHttpClient>(client =>
     client.DefaultRequestHeaders.Add("Accept", "application/json");
 });
 
-builder.Services.AddHttpClient<AuthorizationHttpClient>(client =>
+builder.Services.AddHttpClient<AuthorizationProviderHttpClient>(client =>
 {
     client.BaseAddress = new Uri(""); // TODO token provider here
     client.DefaultRequestHeaders.Add("Accept", "application/json");
@@ -120,22 +80,6 @@ builder
     })
     .AddDefaultTokenProviders()
     .AddEntityFrameworkStores<DataContext>();
-
-//builder
-//    .Services.AddAuthentication(options =>
-//    {
-//        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-//        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-//    })
-//    .AddJwtBearer(options =>
-//    {
-//        var key = Encoding.ASCII.GetBytes(builder.Configuration["EmailProviderSecretKey"]!);
-//        options.TokenValidationParameters = new TokenValidationParameters
-//        {
-//            IssuerSigningKey = new SymmetricSecurityKey(key),
-//            ValidateIssuerSigningKey = true
-//        };
-//    });
 
 var app = builder.Build();
 
@@ -159,7 +103,6 @@ app.UseRouting();
 
 app.UseCors("AllowSpecificOrigin");
 
-//app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

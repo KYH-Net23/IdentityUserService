@@ -11,9 +11,8 @@ public class MinimumAge : ValidationAttribute
         if (value is not DateTime birthDay)
             return new ValidationResult("Please enter a valid date format.");
 
-        if (birthDay.AddYears(MinAge) <= DateTime.Now)
-            return ValidationResult.Success;
-
-        return new ValidationResult("You have to be at least 18 years old to register.");
+        return birthDay.AddYears(MinAge) <= DateTime.Now
+            ? ValidationResult.Success
+            : new ValidationResult("You have to be at least 18 years old to register.");
     }
 }

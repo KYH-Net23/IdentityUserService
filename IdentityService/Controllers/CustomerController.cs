@@ -43,7 +43,9 @@ public class CustomerController(CustomerService customerService, UserService use
     }
 
     [HttpPut("")]
-    public async Task<IActionResult> ConfirmEmail([FromBody] UpdateEmailRequest model)
+    public async Task<IActionResult> ConfirmEmail(
+        [FromBody] AuthorizationForEmailProviderRequestModel model
+    )
     {
         // Call on auth provider
 

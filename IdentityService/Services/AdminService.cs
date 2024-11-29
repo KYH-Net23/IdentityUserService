@@ -6,10 +6,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace IdentityService.Services;
 
-public class AdminService(
-    SignInManager<IdentityUser> signInManager,
-    UserManager<IdentityUser> userManager
-)
+public class AdminService(UserManager<IdentityUser> userManager)
 {
     public async Task<List<AdminRequestResponse>> GetAdmins()
     {
