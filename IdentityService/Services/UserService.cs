@@ -112,7 +112,7 @@ public class UserService
 
             var userRole = await _userManager.GetRolesAsync(loggedInUser);
 
-            if (loggedInUser is not CustomerEntity customer)
+            if (loggedInUser is not CustomerEntity customer) // User is admin
                 return new ResponseResult
                 {
                     Succeeded = true,
