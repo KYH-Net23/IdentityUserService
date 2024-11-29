@@ -55,13 +55,15 @@ builder.Services.AddScoped<UserService>();
 
 builder.Services.AddHttpClient<VerificationHttpClient>(client =>
 {
-    client.BaseAddress = new Uri("https://rika-verification-provider.azurewebsites.net/api/");
+    client.BaseAddress = new Uri("https://rika-verification-provider.azurewebsites.net/api");
     client.DefaultRequestHeaders.Add("Accept", "application/json");
 });
 
 builder.Services.AddHttpClient<AuthorizationProviderHttpClient>(client =>
 {
-    client.BaseAddress = new Uri(""); // TODO token provider here
+    client.BaseAddress = new Uri(
+        "https://rika-tokenservice-agbebvf3drayfqf6.swedencentral-01.azurewebsites.net"
+    );
     client.DefaultRequestHeaders.Add("Accept", "application/json");
 });
 

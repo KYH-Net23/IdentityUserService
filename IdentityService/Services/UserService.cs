@@ -117,6 +117,7 @@ public class UserService(
 
             customer.LastActiveDate = DateTime.Now;
             await userManager.UpdateAsync(customer);
+
             return new ResponseResult
             {
                 Succeeded = true,

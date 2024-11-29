@@ -21,16 +21,14 @@ namespace IdentityService.Controllers
             _emailProviderHttpClient = emailProviderHttpClient;
         }
 
-        [HttpPost("")]
+        [HttpPost("/send-reset-password-email")]
         public async Task<IActionResult> GetUserId([FromBody] EmailModel model)
         {
             try
             {
                 var result = await _userService.FindUserByEmailAsync(model.Email);
                 if (result == null)
-                {
                     return NotFound();
-                }
 
                 await _emailProviderHttpClient.PostAsync("/reset", result);
 
@@ -51,9 +49,7 @@ namespace IdentityService.Controllers
             {
                 var result = await _userService.ResetPassword(model.ResetGuid);
                 if (result)
-                {
                     return Ok();
-                }
 
                 return BadRequest();
             }
@@ -63,7 +59,7 @@ namespace IdentityService.Controllers
             }
         }
 
-        [HttpPost("/changepassword")]
+        [HttpPost("/change-password")]
         public async Task<IActionResult> ChangePasswordRequest(
             [FromBody] ChangePasswordRequestModel requestModel
         )
