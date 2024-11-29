@@ -32,4 +32,5 @@ public class CustomerEntity : IdentityUser
     public DateTime LastActiveDate { get; set; }
     public bool IsDeleted { get; set; }
     public bool? HasRequestedPasswordReset { get; set; }
+    public string? PasswordResetGuid { get; set; }
 }

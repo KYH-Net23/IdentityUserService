@@ -10,4 +10,5 @@ public class AdminEntity : IdentityUser
     public AdminLevel AdminLevel { get; set; }
     public bool IsDeleted { get; set; }
     public bool? HasRequestedPasswordReset { get; set; }
+    public string? PasswordResetGuid { get; set; }
 }
