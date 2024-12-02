@@ -41,27 +41,26 @@ public class UserService
                 };
             }
 
+            if (await _userManager.IsEmailConfirmedAsync(loggedInUser))
+            {
+                return new ResponseResult
+                {
+                    Succeeded = false,
+                    Message = "User email is not confirmed.",
+                    Content = new EmailRequestModel
+                    {
+                        EmailAddress = loginRequestModel.Email,
+                        UserId = loginRequestModel.Email
+                    }
+                };
+            }
+
             var tryToSignIn = await _signInManager.PasswordSignInAsync(
                 loggedInUser.UserName!,
                 loginRequestModel.Password,
                 rememberMe,
                 false
             );
-
-            if (tryToSignIn.IsNotAllowed)
-            {
-                return new ResponseResult
-                {
-                    Succeeded = false,
-                    Message =
-                        $"Your email ({loginRequestModel.Email}) is not confirmed. Please check your email for instructions.",
-                    Content = new EmailRequestModel
-                    {
-                        EmailAddress = loginRequestModel.Email,
-                        UserId = loginRequestModel.Email // TODO change to ID later
-                    }
-                };
-            }
 
             if (!tryToSignIn.Succeeded)
             {
@@ -263,26 +262,33 @@ public class UserService
                 .FirstOrDefaultAsync(x => x.PasswordResetGuid == requestModel.Id);
 
             if (customer?.HasRequestedPasswordReset is null)
-                return IdentityResult.Failed(); // add error message that user does not exist
+                return IdentityResult.Failed(
+                    new IdentityError
+                    {
+                        Code = "UserDoesNotExist",
+                        Description = "The user does not exist."
+                    }
+                );
 
             await _userManager.RemovePasswordAsync(customer);
             var result = await _userManager.AddPasswordAsync(customer, requestModel.NewPassword);
 
             if (!result.Succeeded)
-            {
                 return IdentityResult.Failed(result.Errors.ToArray());
-            }
 
             customer.LockoutEnd = null;
             customer.HasRequestedPasswordReset = null;
             customer.PasswordResetGuid = null;
+
             await _userManager.UpdateAsync(customer);
 
             return result;
         }
-        catch
+        catch (Exception e)
         {
-            return IdentityResult.Failed(); // add message that try catch failed
+            return IdentityResult.Failed(
+                new IdentityError { Code = e.Message, Description = e.Message }
+            );
         }
     }
 }

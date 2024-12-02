@@ -1,4 +1,5 @@
-﻿using IdentityService.Models.RequestModels;
+﻿using Azure.Communication.Email;
+using IdentityService.Models.RequestModels;
 using IdentityService.Services;
 using IdentityService.Services.HttpClientServices;
 using Microsoft.AspNetCore.Mvc;
@@ -35,7 +36,7 @@ public class LoginController : ControllerBase
         var responseMessage = await _verificationService.PostAsync(emailRequestModel);
 
         if (responseMessage.IsSuccessStatusCode)
-            return Ok(new { Message = "Go to the auth site" }); // TODO better message here
+            return Ok(new { Message = "Redirect the user to the authorization page." });
 
         return BadRequest(new { result });
     }
