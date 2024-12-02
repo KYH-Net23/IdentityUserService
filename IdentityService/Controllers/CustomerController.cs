@@ -1,6 +1,7 @@
 ﻿using IdentityService.Models.RequestModels;
 using IdentityService.Models.ResponseModels;
 using IdentityService.Services;
+using IdentityService.Services.HttpClientServices;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IdentityService.Controllers;
@@ -11,11 +12,17 @@ public class CustomerController : ControllerBase
 {
     private readonly CustomerService _customerService;
     private readonly UserService _userService;
+    private readonly VerificationHttpClient _verificationHttpClient;
 
-    public CustomerController(CustomerService customerService, UserService userService)
+    public CustomerController(
+        CustomerService customerService,
+        UserService userService,
+        VerificationHttpClient verificationHttpClient
+    )
     {
         _customerService = customerService;
         _userService = userService;
+        _verificationHttpClient = verificationHttpClient;
     }
 
     [HttpGet("")]
@@ -41,7 +48,12 @@ public class CustomerController : ControllerBase
             if (!result.Succeeded)
                 return BadRequest(new { result.Message, PasswordErrors = result.Content });
 
-            return Ok(new { result.Message });
+            await _verificationHttpClient.PostAsync(result.Content as EmailRequestModel);
+
+            if (result.Succeeded)
+                return Ok(new { result.Message });
+
+            return BadRequest(new { result.Message });
         }
         catch (Exception e)
         {

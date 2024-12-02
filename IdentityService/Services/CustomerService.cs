@@ -57,11 +57,17 @@ public class CustomerService
             }
             await _userManager.AddToRoleAsync(newCustomer, UserRoles.Customer.ToString());
 
+            var customer = await _userManager.FindByEmailAsync(registerRequestModel.Email);
+
             return new ResponseResult
             {
                 Succeeded = true,
                 Message = "User created",
-                Content = _userManager.FindByEmailAsync(registerRequestModel.Email)
+                Content = new EmailRequestModel
+                {
+                    EmailAddress = customer.Email,
+                    UserId = customer.Id
+                }
             };
         }
         catch (Exception e)

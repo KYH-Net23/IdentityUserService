@@ -1,6 +1,7 @@
 ﻿using IdentityService.Models.RequestModels;
 using IdentityService.Services;
 using IdentityService.Services.HttpClientServices;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IdentityService.Controllers
@@ -24,6 +25,8 @@ namespace IdentityService.Controllers
         [HttpPost("/send-reset-password-email")]
         public async Task<IActionResult> GetUserId([FromBody] EmailModel model)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             try
             {
                 var result = await _userService.FindUserByEmailAsync(model.Email);
@@ -45,6 +48,10 @@ namespace IdentityService.Controllers
             [FromBody] PasswordResetRequestModel model
         )
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             try
             {
                 var result = await _userService.ResetPassword(model.ResetGuid);
@@ -64,13 +71,15 @@ namespace IdentityService.Controllers
             [FromBody] ChangePasswordRequestModel requestModel
         )
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             try
             {
                 var result = await _userService.ChangePassword(requestModel);
                 if (result.Succeeded)
                     return Ok();
 
-                return BadRequest(result.Errors);
+                return BadRequest(result.Errors.Select(x => x.Description));
             }
             catch (Exception ex)
             {

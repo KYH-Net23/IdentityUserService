@@ -228,6 +228,7 @@ public class UserService
                 user,
                 DateTime.Now.AddHours(LockOutDurationInHours)
             );
+
             user.HasRequestedPasswordReset = true;
             await _userManager.UpdateAsync(user);
 
@@ -257,18 +258,22 @@ public class UserService
     {
         try
         {
-            var user = await _userManager.FindByEmailAsync(requestModel.Email);
+            var customer = await _userManager
+                .Users.Cast<CustomerEntity>()
+                .FirstOrDefaultAsync(x => x.PasswordResetGuid == requestModel.Id);
 
-            if (user is not CustomerEntity customer || customer.HasRequestedPasswordReset is null)
-                return IdentityResult.Failed();
+            if (customer?.HasRequestedPasswordReset is null)
+                return IdentityResult.Failed(); // add error message that user does not exist
 
-            await _userManager.RemovePasswordAsync(user);
-            var result = await _userManager.AddPasswordAsync(user, requestModel.NewPassword);
+            await _userManager.RemovePasswordAsync(customer);
+            var result = await _userManager.AddPasswordAsync(customer, requestModel.NewPassword);
 
             if (!result.Succeeded)
-                return result;
+            {
+                return IdentityResult.Failed(result.Errors.ToArray());
+            }
 
-            user.LockoutEnd = null;
+            customer.LockoutEnd = null;
             customer.HasRequestedPasswordReset = null;
             customer.PasswordResetGuid = null;
             await _userManager.UpdateAsync(customer);
@@ -277,7 +282,7 @@ public class UserService
         }
         catch
         {
-            return IdentityResult.Failed();
+            return IdentityResult.Failed(); // add message that try catch failed
         }
     }
 }

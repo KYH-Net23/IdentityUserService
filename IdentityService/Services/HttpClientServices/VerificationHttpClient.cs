@@ -1,4 +1,6 @@
-﻿using IdentityService.Models.RequestModels;
+﻿using System.Text;
+using IdentityService.Models.RequestModels;
+using Newtonsoft.Json;
 
 namespace IdentityService.Services.HttpClientServices;
 
@@ -13,7 +15,11 @@ public class VerificationHttpClient
 
     public async Task<HttpResponseMessage> PostAsync(EmailRequestModel emailRequestModel)
     {
-        var response = await _httpClient.PostAsJsonAsync("passcode/generate", emailRequestModel);
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/passcode/generate");
+        var jsonBody = JsonConvert.SerializeObject(emailRequestModel);
+
+        request.Content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
+        var response = await _httpClient.SendAsync(request);
 
         return response;
     }
