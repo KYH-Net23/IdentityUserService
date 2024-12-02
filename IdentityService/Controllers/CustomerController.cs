@@ -48,7 +48,7 @@ public class CustomerController : ControllerBase
             if (!result.Succeeded)
                 return BadRequest(new { result.Message, PasswordErrors = result.Content });
 
-            await _verificationHttpClient.PostAsync(result.Content as EmailRequestModel);
+            await _verificationHttpClient.PostAsync((result.Content as EmailRequestModel)!);
 
             if (result.Succeeded)
                 return Ok(new { result.Message });
