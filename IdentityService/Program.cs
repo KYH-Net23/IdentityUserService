@@ -59,14 +59,6 @@ builder.Services.AddHttpClient<VerificationHttpClient>(client =>
     client.DefaultRequestHeaders.Add("Accept", "application/json");
 });
 
-builder.Services.AddHttpClient<AuthorizationProviderHttpClient>(client =>
-{
-    client.BaseAddress = new Uri(
-        "https://rika-tokenservice-agbebvf3drayfqf6.swedencentral-01.azurewebsites.net"
-    );
-    client.DefaultRequestHeaders.Add("Accept", "application/json");
-});
-
 builder.Services.AddHttpClient<EmailProviderHttpClient>(client =>
 {
     client.BaseAddress = new Uri("https://rika-solutions-email-provider.azurewebsites.net");

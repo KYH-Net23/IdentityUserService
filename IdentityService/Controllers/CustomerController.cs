@@ -41,7 +41,6 @@ public class CustomerController : ControllerBase
             if (!result.Succeeded)
                 return BadRequest(new { result.Message, PasswordErrors = result.Content });
 
-            // TODO Send request to verification provider here
             return Ok(new { result.Message });
         }
         catch (Exception e)
@@ -51,14 +50,8 @@ public class CustomerController : ControllerBase
     }
 
     [HttpPut("")]
-    public async Task<IActionResult> ConfirmEmail(
-        [FromBody] AuthorizationForEmailProviderRequestModel model
-    )
+    public async Task<IActionResult> ConfirmEmail([FromBody] EmailModel model)
     {
-        // Call on auth provider
-
-        var authorizationResult = "await"; // TODO add token provider call here to auth a token
-
         if (!ModelState.IsValid)
         {
             var errors = ModelState.Values.SelectMany(v => v.Errors);

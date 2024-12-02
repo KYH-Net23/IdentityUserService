@@ -2,6 +2,7 @@
 using IdentityService.Models.RequestModels;
 using IdentityService.Models.ResponseModels;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace IdentityService.Services;
@@ -155,11 +156,8 @@ public class UserService
         }
     }
 
-    public async Task<ResponseResult> UpdateEmailConfirmation(
-        AuthorizationForEmailProviderRequestModel model
-    )
+    public async Task<ResponseResult> UpdateEmailConfirmation(EmailModel model)
     {
-        // Verification provider calls on this
         try
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
