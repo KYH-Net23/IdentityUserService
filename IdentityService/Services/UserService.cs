@@ -41,7 +41,7 @@ public class UserService
                 };
             }
 
-            if (await _userManager.IsEmailConfirmedAsync(loggedInUser))
+            if (!await _userManager.IsEmailConfirmedAsync(loggedInUser))
             {
                 return new ResponseResult
                 {
